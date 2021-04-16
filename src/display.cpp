@@ -48,6 +48,6 @@ size_t Display::getInput(char* buffer) {
 }
 
 void Display::set80columns() {
-    _minitel.modeMixte();
+    _minitel.modeTeleinformatique();
     _minitel.echo(false);
 }
