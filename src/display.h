@@ -7,6 +7,7 @@ class Display {
     Display();
     size_t print(const char*);
     size_t getInput(char*);
+    void set80columns();
 
     private:
     Minitel _minitel = Minitel(Serial);

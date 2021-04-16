@@ -3,6 +3,7 @@
 Display::Display() {
     _minitel.changeSpeed(4800);
     _minitel.smallMode();
+    _minitel.echo(false);
 }
 
 // Output a null-terminated string to the minitel
@@ -44,4 +45,9 @@ size_t Display::getInput(char* buffer) {
         return 3;
     }
     return 4;
+}
+
+void Display::set80columns() {
+    _minitel.modeMixte();
+    _minitel.echo(false);
 }
