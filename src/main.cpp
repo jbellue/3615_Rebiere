@@ -141,6 +141,7 @@ void controlTask(void *pvParameter) {
                 }
                 break;
             case STATE_GOT_IPADDR:
+                display.set80columns();
                 libssh_begin();
                 session = start_session();
                 if (session) {
