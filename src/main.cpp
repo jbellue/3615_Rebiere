@@ -260,8 +260,6 @@ void close_session(ssh_session session) {
 }
 
 void setup() {
-    Serial.begin(4800);
-
     gotIpAddr = false;
     wifiPhyConnected = false;
 
