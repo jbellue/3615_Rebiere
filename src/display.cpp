@@ -3,7 +3,6 @@
 Display::Display() {
     _minitel.changeSpeed(4800);
     _minitel.smallMode();
-    _minitel.echo(false);
 }
 
 // Output a null-terminated string to the minitel
@@ -43,8 +42,8 @@ size_t Display::getInput(char* buffer) {
     buffer[0] = (char)((key >> 16) & 0xFF);
     buffer[1] = (char)((key >> 8) & 0xFF);
     buffer[2] = (char)(key & 0xFF);
-        return 3;
-    }
+    return 3;
+}
 
 void Display::set80columns() {
     _minitel.modeTeleinformatique();

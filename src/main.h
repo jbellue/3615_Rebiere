@@ -7,9 +7,10 @@
 // Networking state of the device.
 typedef enum {
     STATE_NEW,
-    STATE_PHY_CONNECTED,
-    STATE_WAIT_IPADDR,
+    STATE_HOME_MENU,
+    STATE_WAITING_FOR_HOME_CHOICE,
     STATE_GOT_IPADDR,
+    STATE_SSH_CONNECT,
     STATE_COMMUNICATING,
     STATE_CLEANUP
 } devState_t;
