@@ -31,21 +31,20 @@ size_t Display::getInput(char* buffer) {
         default:
             break;
     }
-    buffer[0] = (char)((key >> 16) & 0xFF);
-    buffer[1] = (char)((key >> 8) & 0xFF);
-    buffer[2] = (char)(key & 0xFF);
-
     if (!(key >> 8)) {
+        buffer[0] = (char)(key & 0xFF);
         return 1;
     }
     if (!(key >> 16)) {
+        buffer[0] = (char)((key >> 8) & 0xFF);
+        buffer[1] = (char)(key & 0xFF);
         return 2;
     }
-    if (!(key >> 24)) {
+    buffer[0] = (char)((key >> 16) & 0xFF);
+    buffer[1] = (char)((key >> 8) & 0xFF);
+    buffer[2] = (char)(key & 0xFF);
         return 3;
     }
-    return 4;
-}
 
 void Display::set80columns() {
     _minitel.modeTeleinformatique();
