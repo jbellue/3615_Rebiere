@@ -1,8 +1,8 @@
 #include "sshClient.h"
 
-SSHClient::SSHClient() {
+SSHClient::SSHClient(const char* host, const char* username, const char* password) {
     libssh_begin();
-    if (start_session()) {
+    if (start_session(host, username, password)) {
         if (open_channel()) {
             if (SSH_OK == interactive_shell_session()) {
                 return;
@@ -121,8 +121,8 @@ int SSHClient::interactive_shell_session() {
     return ret;
 }
 
-bool SSHClient::start_session() {
-    if (!connect_ssh("192.168.1.74", "minitel", "3615", SSH_LOG_NOLOG)) {
+bool SSHClient::start_session(const char *host, const char *user, const char *password) {
+    if (!connect_ssh(host, user, password, SSH_LOG_NOLOG)) {
         // Serial.println("No ssh session created");
         ssh_finalize();
         return false;

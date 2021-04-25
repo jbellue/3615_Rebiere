@@ -10,9 +10,15 @@ class Display {
     size_t print(const char*);
     size_t getInput(char*);
     void set80columns();
+    void set40columns();
+    Minitel* minitel();
+
+    void println(const char*);
 
     private:
     Minitel _minitel = Minitel(Serial);
+    char _input[255];
+    uint8_t _input_index;
 };
 
 #endif

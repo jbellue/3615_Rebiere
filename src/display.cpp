@@ -1,6 +1,8 @@
 #include "display.h"
 
 Display::Display() {
+    memset(_input, '\0', sizeof _input);
+    _input_index = 0;
     _minitel.changeSpeed(4800);
     _minitel.smallMode();
 }
@@ -16,19 +18,14 @@ size_t Display::print(const char* buffer) {
     return index;
 }
 
+void Display::println(const char* string) {
+    _minitel.println(string);
+}
+
 size_t Display::getInput(char* buffer) {
     unsigned long key = _minitel.getKeyCode();
     if (!key) {
         return 0;
-    }
-    switch(key) {
-        case CORRECTION:
-            key = 0x07f;
-            break;
-        case ENVOI:
-            key = 0x0d;
-        default:
-            break;
     }
     if (!(key >> 8)) {
         buffer[0] = (char)(key & 0xFF);
@@ -48,4 +45,14 @@ size_t Display::getInput(char* buffer) {
 void Display::set80columns() {
     _minitel.modeTeleinformatique();
     _minitel.echo(false);
+}
+
+void Display::set40columns() {
+    _minitel.modeVideotex();
+    _minitel.echo(false);
+}
+
+
+Minitel* Display::minitel(){
+    return &_minitel;
 }

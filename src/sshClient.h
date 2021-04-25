@@ -7,10 +7,10 @@
 
 class SSHClient {
     public:
-    SSHClient();
+    SSHClient(const char *host, const char *user, const char *password);
     bool connect_ssh(const char *host, const char *user, const char *password, const int verbosity);
     bool poll(Display display);
-    bool start_session();
+    bool start_session(const char *host, const char *user, const char *password);
     void close_session();
     int interactive_shell_session();
     void close_channel();
