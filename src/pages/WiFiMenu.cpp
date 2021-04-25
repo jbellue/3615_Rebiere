@@ -1,5 +1,4 @@
 #include "WiFiMenu.h"
-#include "WiFi.h"
 #include <string>
 
 uint8_t WiFiMenu::run() {
@@ -49,10 +48,10 @@ uint8_t WiFiMenu::run() {
     }
 }
 
-static bool eventUpdate = false;
-static uint8_t potato = 0;
+static uint8_t connectionStatus;
 
 void WiFiMenu::passwordForm() {
+    connectionStatus = 255;
     _minitel->moveCursorDown(1);
     _minitel->println("Mot de passe :");
     _minitel->print(".");
@@ -60,6 +59,7 @@ void WiFiMenu::passwordForm() {
     _minitel->moveCursorLeft(40);
     _minitel->moveCursorUp(1);
     _password = "";
+    _minitel->cursor();
 
     unsigned long key = _minitel->getKeyCode();
     while(key != ENVOI) {
@@ -102,129 +102,33 @@ void WiFiMenu::passwordForm() {
     _minitel->println("Connexion...");
     connectToAP();
 
-    while(WiFi.status() != WL_CONNECTED) {
-        if (eventUpdate) {
-            eventUpdate = false;
-            _minitel->print("new state: \"");
-            switch(potato) {
-                case SYSTEM_EVENT_WIFI_READY:
-                    _minitel->println("SYSTEM_EVENT_WIFI_READY");
-                    break;
-                case SYSTEM_EVENT_SCAN_DONE:
-                    _minitel->println("SYSTEM_EVENT_SCAN_DONE");
-                    break;
-                case SYSTEM_EVENT_STA_START:
-                    _minitel->println("SYSTEM_EVENT_STA_START");
-                    break;
-                case SYSTEM_EVENT_STA_STOP:
-                    _minitel->println("SYSTEM_EVENT_STA_STOP");
-                    break;
-                case SYSTEM_EVENT_STA_CONNECTED:
-                    _minitel->println("SYSTEM_EVENT_STA_CONNECTED");
-                    break;
-                case SYSTEM_EVENT_STA_DISCONNECTED:
-                    _minitel->println("SYSTEM_EVENT_STA_DISCONNECTED");
-                    break;
-                case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
-                    _minitel->println("SYSTEM_EVENT_STA_AUTHMODE_CHANGE");
-                    break;
-                case SYSTEM_EVENT_STA_GOT_IP:
-                    _minitel->println("SYSTEM_EVENT_STA_GOT_IP");
-                    break;
-                case SYSTEM_EVENT_STA_LOST_IP:
-                    _minitel->println("SYSTEM_EVENT_STA_LOST_IP");
-                    break;
-                case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
-                    _minitel->println("SYSTEM_EVENT_STA_WPS_ER_SUCCESS");
-                    break;
-                case SYSTEM_EVENT_STA_WPS_ER_FAILED:
-                    _minitel->println("SYSTEM_EVENT_STA_WPS_ER_FAILED");
-                    break;
-                case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
-                    _minitel->println("SYSTEM_EVENT_STA_WPS_ER_TIMEOUT");
-                    break;
-                case SYSTEM_EVENT_STA_WPS_ER_PIN:
-                    _minitel->println("SYSTEM_EVENT_STA_WPS_ER_PIN");
-                    break;
-                case SYSTEM_EVENT_STA_WPS_ER_PBC_OVERLAP:
-                    _minitel->println("SYSTEM_EVENT_STA_WPS_ER_PBC_OVERLAP");
-                    break;
-                case SYSTEM_EVENT_AP_START:
-                    _minitel->println("SYSTEM_EVENT_AP_START");
-                    break;
-                case SYSTEM_EVENT_AP_STOP:
-                    _minitel->println("SYSTEM_EVENT_AP_STOP");
-                    break;
-                case SYSTEM_EVENT_AP_STACONNECTED:
-                    _minitel->println("SYSTEM_EVENT_AP_STACONNECTED");
-                    break;
-                case SYSTEM_EVENT_AP_STADISCONNECTED:
-                    _minitel->println("SYSTEM_EVENT_AP_STADISCONNECTED");
-                    break;
-                case SYSTEM_EVENT_AP_STAIPASSIGNED:
-                    _minitel->println("SYSTEM_EVENT_AP_STAIPASSIGNED");
-                    break;
-                case SYSTEM_EVENT_AP_PROBEREQRECVED:
-                    _minitel->println("SYSTEM_EVENT_AP_PROBEREQRECVED");
-                    break;
-                case SYSTEM_EVENT_GOT_IP6:
-                    _minitel->println("SYSTEM_EVENT_GOT_IP6");
-                    break;
-                case SYSTEM_EVENT_ETH_START:
-                    _minitel->println("SYSTEM_EVENT_ETH_START");
-                    break;
-                case SYSTEM_EVENT_ETH_STOP:
-                    _minitel->println("SYSTEM_EVENT_ETH_STOP");
-                    break;
-                case SYSTEM_EVENT_ETH_CONNECTED:
-                    _minitel->println("SYSTEM_EVENT_ETH_CONNECTED");
-                    break;
-                case SYSTEM_EVENT_ETH_DISCONNECTED:
-                    _minitel->println("SYSTEM_EVENT_ETH_DISCONNECTED");
-                    break;
-                case SYSTEM_EVENT_ETH_GOT_IP:
-                    _minitel->println("SYSTEM_EVENT_ETH_GOT_IP");
-                    break;
-            }
-            _minitel->println("\"");
-        }
-        else {
-            _minitel->print(".");
-        }
-    }
+    while(connectionStatus == 255); // wait until we get a connection or rejection
     _minitel->moveCursorDown(1);
-    _minitel->println("Connecté !");
-    delay(1000);
-    _state = STATE_DONE;
+    if (connectionStatus == 0) {
+        _minitel->println("Connecté !");
+        _state = STATE_DONE;
+        delay(1000);
+    }
+    else {
+        _minitel->println("Impossible de se connecter.");
+        _minitel->println("Vérifier le mot de passe.");
+        delay(2000);
+        _minitel->moveCursorUp(7);
+        _minitel->clearScreenFromCursor();
+    }
 }
 
-esp_err_t wifiEventHandler(void *ctx, system_event_t *event) {
-    switch(event->event_id) {
-        case SYSTEM_EVENT_STA_GOT_IP:
-            _connectionRetryCount = 0;
-            break;
-        case SYSTEM_EVENT_STA_DISCONNECTED:
-            if (_connectionRetryCount < 3) {
-                esp_wifi_connect();
-                ++_connectionRetryCount;
-            }
-            break;
-        default:
-            break;
+void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
+    if(event == SYSTEM_EVENT_STA_DISCONNECTED) {
+        connectionStatus = 2;
     }
-    eventUpdate = true;
-    potato = event->event_id;
-
-    // system_event_sta_disconnected_t *disconnected = &event->event_info.disconnected;
-    // printf("reason:%d\n", disconnected->reason);
-
-    return ESP_OK;
+    else if (event == SYSTEM_EVENT_STA_GOT_IP) {
+        connectionStatus = 0;
+    }
 }
 
 void WiFiMenu::connectToAP() {
-    esp_event_loop_init(wifiEventHandler, NULL);
-
-
+    WiFi.onEvent(WiFiEvent);
     WiFi.disconnect(true);
     WiFi.mode(WIFI_MODE_STA);
 
@@ -279,29 +183,6 @@ void WiFiMenu::showPage() {
             _minitel->moveCursorDown(2);
             _minitel->println(buffer);
             for (int16_t i = 0; i < n; ++i) {
-                // switch (WiFi.encryptionType(i)) {
-                //     case WIFI_AUTH_OPEN:
-                //         line += "ouvert";
-                //         break;
-                //     case WIFI_AUTH_WEP:
-                //         line += "WEP";
-                //         break;
-                //     case WIFI_AUTH_WPA_PSK:
-                //         line += "WPA PSK";
-                //         break;
-                //     case WIFI_AUTH_WPA2_PSK:
-                //         line += "WPA2 PSK";
-                //         break;
-                //     case WIFI_AUTH_WPA_WPA2_PSK:
-                //         line += "WPA WPA2 PSK";
-                //         break;
-                //     case WIFI_AUTH_WPA2_ENTERPRISE:
-                //         line += "WPA2 ENTREPRISE";
-                //         break;
-                //     case WIFI_AUTH_MAX:
-                //         line += "MAX";
-                //         break;
-                // }
                 sprintf(buffer, "%i : %s", i+1, WiFi.SSID(i).c_str());
                 _minitel->println(buffer);
             }

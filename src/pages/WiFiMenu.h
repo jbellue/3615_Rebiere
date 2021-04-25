@@ -5,6 +5,7 @@
 #include <Minitel1B_Hard.h>
 #include "esp_wifi_types.h"
 #include "esp_wifi.h"
+#include <WiFi.h>
 
 
 static uint8_t _connectionRetryCount;
@@ -49,6 +50,7 @@ private:
 
     char _input;
 };
-esp_err_t wifiEventHandler(void *ctx, system_event_t *event);
+
+void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info);
 
 #endif
