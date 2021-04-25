@@ -8,13 +8,18 @@ uint8_t WiFiMenu::run() {
                 showPage();
                 _state = STATE_WAITING_FOR_INPUT;
                 break;
-            case STATE_WAITING_FOR_INPUT:
-                if (getInput()) {
+            case STATE_WAITING_FOR_INPUT: {
+                unsigned long input = getInput();
+                if (input == ENVOI) {
                     _state = STATE_CHECK_INPUT;
                     _minitel->moveCursorReturn(1);
                     _minitel->noCursor();
                 }
-                break;
+                else if (input == SOMMAIRE) {
+                    _state = STATE_DONE;
+                }
+            }
+            break;
             case STATE_CHECK_INPUT: {
                 const uint8_t action = checkInput();
                 if (!action) {
@@ -39,7 +44,6 @@ uint8_t WiFiMenu::run() {
                 break;
             }
             case STATE_ENTER_PASSWORD:
-                _page = PAGE_ENTER_PASSWORD;
                 passwordForm();
                 break;
             case STATE_DONE:
@@ -68,12 +72,15 @@ void WiFiMenu::passwordForm() {
                 _state = STATE_NEW;
                 return;
             case 0:
+            case '\n':
             case REPETITION:
             case GUIDE:
-            case SOMMAIRE:
             case SUITE:
             case CONNEXION_FIN:
                 break;
+            case SOMMAIRE:
+                _state = STATE_DONE;
+                return;
             case CORRECTION:
                 if (_password.length() > 0) {
                     _password.remove(_password.length() - 1, 1);
@@ -199,22 +206,24 @@ void WiFiMenu::showPage() {
     _minitel->moveCursorLeft(1);
 }
 
-uint8_t WiFiMenu::getInput() {
+unsigned long WiFiMenu::getInput() {
     unsigned long key = _minitel->getKeyCode();
     switch (key) {
-        case ENVOI:
-            return 1;
-            break;
         case CORRECTION:
         case ANNULATION:
             _input = '\0';
             _minitel->moveCursorLeft(1);
             break;
+        case ENVOI:
+        case SOMMAIRE:
+            return key;
+        case 0:
+        case '\n':
+            // ignore
+            break;
         default:
-            if(key) {
-                _input = (char)key;
-                _minitel->moveCursorLeft(1);
-            }
+            _input = (char)key;
+            _minitel->moveCursorLeft(1);
             break;
     }
     return 0;

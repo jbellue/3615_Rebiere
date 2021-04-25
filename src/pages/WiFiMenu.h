@@ -20,7 +20,7 @@ public:
 
 private:
     void showPage();
-    uint8_t getInput();
+    unsigned long getInput();
     uint8_t checkInput();
     void passwordForm();
     void connectToAP();
@@ -30,14 +30,12 @@ private:
         STATE_WAITING_FOR_INPUT,
         STATE_CHECK_INPUT,
         STATE_ENTER_PASSWORD,
-        STATE_VALIDATE_PASSWORD,
         STATE_DONE
     };
 
     enum Page {
         PAGE_DISCONNECT,
-        PAGE_SELECT_NETWORK,
-        PAGE_ENTER_PASSWORD
+        PAGE_SELECT_NETWORK
     };
 
     Minitel* _minitel;
