@@ -3,7 +3,7 @@
 #include "pages/menu.h"
 #include "pages/WiFiMenu.h"
 #include "pages/sshPage.h"
-
+#include <WiFi.h>
 
 #define NET_WAIT_MS 100
 
@@ -61,6 +61,7 @@ void controlTask(void *pvParameter) {
 void setup() {
     devState = STATE_NEW;
     xTaskCreatePinnedToCore(controlTask, "control", configSTACK, NULL, (tskIDLE_PRIORITY + 3), NULL, portNUM_PROCESSORS - 1);
+    WiFi.begin();
 }
 
 void loop() {
