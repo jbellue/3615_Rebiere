@@ -49,7 +49,8 @@ void Display::set80columns() {
 
 void Display::set40columns() {
     _minitel.modeVideotex();
-    _minitel.echo(false);
+    _minitel.echo(true);
+    _minitel.smallMode();
 }
 
 
