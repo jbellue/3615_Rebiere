@@ -1,8 +1,6 @@
 #include "display.h"
 
 Display::Display() {
-    memset(_input, '\0', sizeof _input);
-    _input_index = 0;
     _minitel.changeSpeed(4800);
     _minitel.smallMode();
 }

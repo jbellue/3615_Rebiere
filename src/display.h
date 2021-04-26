@@ -17,8 +17,6 @@ class Display {
 
     private:
     Minitel _minitel = Minitel(Serial);
-    char _input[255];
-    uint8_t _input_index;
 };
 
 #endif
