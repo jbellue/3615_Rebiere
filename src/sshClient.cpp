@@ -71,7 +71,7 @@ bool SSHClient::connect_ssh(const char *host, const char *user, const char *pass
 
 
     // Authenticate ourselves
-    if (ssh_userauth_password(_session, NULL, "3615") != SSH_AUTH_SUCCESS) {
+    if (ssh_userauth_password(_session, NULL, password) != SSH_AUTH_SUCCESS) {
         // Serial.print("Error authenticating with password: ");
         // Serial.println(ssh_get_error(session));
         ssh_disconnect(_session);
