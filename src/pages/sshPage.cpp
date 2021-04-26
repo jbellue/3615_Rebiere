@@ -21,17 +21,20 @@ uint8_t SSHPage::run() {
                 break;
             }
             case STATE_CONNECTING:
-                try {
-                    sshClient = new SSHClient(
+                sshClient = new SSHClient();
+                if (sshClient->init(    
                         _inputs[FIELD_HOST].c_str(),
                         _inputs[FIELD_USERNAME].c_str(),
                         _inputs[FIELD_PASSWORD].c_str()
-                    );
+                )) {
                     _display->set80columns();
                     _state = STATE_CONNECTED;
                 }
-                catch(...) {
-                    _state = STATE_DONE;
+                else {
+                    _display->minitel()->moveCursorDown(1);
+                    _display->println("ERREUR DE CONNEXION");
+                    delay(2000);
+                    _state = STATE_NEW;
                 }
                 break;
             case STATE_CONNECTED:
@@ -90,7 +93,7 @@ void SSHPage::showPage() {
 SSHPage::Input SSHPage::getInput() {
     unsigned long key = _display->minitel()->getKeyCode();
     _field = FIELD_HOST;
-    uint8_t x, y;
+    uint8_t x, y = 0;
     while(key != ENVOI && key != SOMMAIRE) {
         switch (key) {
             case RETOUR:

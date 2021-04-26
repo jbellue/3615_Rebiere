@@ -1,15 +1,17 @@
 #include "sshClient.h"
 
-SSHClient::SSHClient(const char* host, const char* username, const char* password) {
+SSHClient::SSHClient() {}
+
+bool SSHClient::init(const char* host, const char* username, const char* password) {
     libssh_begin();
     if (start_session(host, username, password)) {
         if (open_channel()) {
             if (SSH_OK == interactive_shell_session()) {
-                return;
+                return true;
             }
         }
     }
-    throw;
+    return false;
 }
 
 bool SSHClient::poll(Display display) {
@@ -95,9 +97,11 @@ bool SSHClient::open_channel() {
 }
 
 void SSHClient::close_channel() {
-    ssh_channel_close(_channel);
-    ssh_channel_send_eof(_channel);
-    ssh_channel_free(_channel);
+    if(_channel != NULL) {
+        ssh_channel_close(_channel);
+        ssh_channel_send_eof(_channel);
+        ssh_channel_free(_channel);
+    }
 }
 
 int SSHClient::interactive_shell_session() {
