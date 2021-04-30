@@ -34,10 +34,26 @@ size_t Display::getInput(char* buffer) {
         buffer[1] = (char)(key & 0xFF);
         return 2;
     }
-    buffer[0] = (char)((key >> 16) & 0xFF);
-    buffer[1] = (char)((key >> 8) & 0xFF);
-    buffer[2] = (char)(key & 0xFF);
-    return 3;
+    size_t len = 3;
+    switch(key) {
+        case 0x1B4F4D:  //ENVOI
+            buffer[0] = 0x0D;
+            len = 1;
+            break;
+        case 0x1B4F6C:  //CORRECTION
+            buffer[0] = 0x7F;
+            len = 1;
+            break;
+        case 0x1B4F51:  //ANNULATION
+            buffer[0] = 0x15;
+            len = 1;
+            break;
+        default:
+            buffer[0] = (char)((key >> 16) & 0xFF);
+            buffer[1] = (char)((key >> 8) & 0xFF);
+            buffer[2] = (char)(key & 0xFF);
+    }
+    return len;
 }
 
 void Display::set80columns() {
