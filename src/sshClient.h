@@ -8,10 +8,17 @@
 class SSHClient {
     public:
     SSHClient();
-    bool init(const char *host, const char *user, const char *password);
-    bool connect_ssh(const char *host, const char *user, const char *password, const int verbosity);
+
+    enum class SSHStatus {
+        OK,
+        AUTHENTICATION_ERROR,
+        GENERAL_ERROR
+    };
+
+    SSHStatus init(const char *host, const char *user, const char *password);
+    SSHStatus connect_ssh(const char *host, const char *user, const char *password, const int verbosity);
     bool poll(Display display);
-    bool start_session(const char *host, const char *user, const char *password);
+    SSHStatus start_session(const char *host, const char *user, const char *password);
     void close_session();
     int interactive_shell_session();
     void close_channel();

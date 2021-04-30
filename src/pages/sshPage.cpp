@@ -20,23 +20,30 @@ uint8_t SSHPage::run() {
                 }
                 break;
             }
-            case STATE_CONNECTING:
+            case STATE_CONNECTING: {
                 sshClient = new SSHClient();
-                if (sshClient->init(    
+                SSHClient::SSHStatus status = sshClient->init(    
                         _inputs[FIELD_HOST].c_str(),
                         _inputs[FIELD_USERNAME].c_str(),
                         _inputs[FIELD_PASSWORD].c_str()
-                )) {
+                );
+                if (status == SSHClient::SSHStatus::OK) {
                     _display->set80columns();
                     _state = STATE_CONNECTED;
                 }
                 else {
                     _display->minitel()->moveCursorDown(1);
-                    _display->println("ERREUR DE CONNEXION");
+                    if (status == SSHClient::SSHStatus::AUTHENTICATION_ERROR) {
+                        _display->println("ERREUR D'AUTHENTIFICATION");
+                    }
+                    else {
+                        _display->println("ERREUR DE CONNEXION");
+                    }
                     delay(2000);
                     _state = STATE_NEW;
                 }
                 break;
+            }
             case STATE_CONNECTED:
                 if(!sshClient->poll(*_display)) {
                     _state = STATE_DONE;

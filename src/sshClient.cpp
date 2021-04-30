@@ -2,16 +2,20 @@
 
 SSHClient::SSHClient() {}
 
-bool SSHClient::init(const char* host, const char* username, const char* password) {
+SSHClient::SSHStatus SSHClient::init(const char* host, const char* username, const char* password) {
     libssh_begin();
-    if (start_session(host, username, password)) {
+    SSHStatus status = start_session(host, username, password);
+    if (status == SSHStatus::OK) {
         if (open_channel()) {
-            if (SSH_OK == interactive_shell_session()) {
-                return true;
+            if (SSH_OK != interactive_shell_session()) {
+                status = SSHStatus::GENERAL_ERROR;
             }
         }
+        else {
+            status = SSHStatus::GENERAL_ERROR;
+        }
     }
-    return false;
+    return status;
 }
 
 bool SSHClient::poll(Display display) {
@@ -41,46 +45,39 @@ void SSHClient::cleanup() {
     close_session();
 }
 
-bool SSHClient::connect_ssh(const char *host, const char *user, const char *password, const int verbosity) {
+SSHClient::SSHStatus SSHClient::connect_ssh(const char *host, const char *user, const char *password, const int verbosity) {
     _session = ssh_new();
 
     if (_session == NULL) {
-        // Serial.println("Error creating ssh session");
-        return false;
+        return SSHStatus::GENERAL_ERROR;
     }
 
     if (ssh_options_set(_session, SSH_OPTIONS_USER, user) < 0) {
-        // Serial.println("Error setting ssh session user");
         ssh_free(_session);
-        return false;
+        return SSHStatus::GENERAL_ERROR;
     }
 
     if (ssh_options_set(_session, SSH_OPTIONS_HOST, host) < 0) {
-        // Serial.println("Error setting ssh session host");
         ssh_free(_session);
-        return false;
+        return SSHStatus::GENERAL_ERROR;
     }
 
     ssh_options_set(_session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
 
     if (ssh_connect(_session)) {
-        // Serial.print("Connection failed : ");
-        // Serial.println(ssh_get_error(session));
         ssh_disconnect(_session);
         ssh_free(_session);
-        return false;
+        return SSHStatus::GENERAL_ERROR;
     }
 
 
     // Authenticate ourselves
     if (ssh_userauth_password(_session, NULL, password) != SSH_AUTH_SUCCESS) {
-        // Serial.print("Error authenticating with password: ");
-        // Serial.println(ssh_get_error(session));
         ssh_disconnect(_session);
         ssh_free(_session);
-        return false;
+        return SSHStatus::AUTHENTICATION_ERROR;
     }
-    return true;
+    return SSHStatus::OK;
 }
 
 
@@ -125,13 +122,12 @@ int SSHClient::interactive_shell_session() {
     return ret;
 }
 
-bool SSHClient::start_session(const char *host, const char *user, const char *password) {
-    if (!connect_ssh(host, user, password, SSH_LOG_NOLOG)) {
-        // Serial.println("No ssh session created");
+SSHClient::SSHStatus SSHClient::start_session(const char *host, const char *user, const char *password) {
+    SSHStatus status = connect_ssh(host, user, password, SSH_LOG_NOLOG);
+    if (status != SSHStatus::OK) {
         ssh_finalize();
-        return false;
     }
-    return true;
+    return status;
 }
 
 void SSHClient::close_session() {
