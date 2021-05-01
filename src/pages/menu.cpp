@@ -1,7 +1,10 @@
 #include "menu.h"
 
-uint8_t Menu::run() {
-    while(true) {
+uint8_t Menu::run(bool connected) {
+    if (connected != _connected) {
+        _connected = connected;
+        _state = STATE_NEW;
+    }
         switch (_state) {
             case STATE_NEW:
                 showPage();
@@ -24,14 +27,14 @@ uint8_t Menu::run() {
                 }
                 break;
         }
-    }
+    return 0;
 }
 
 uint8_t Menu::checkInput() {
     if (_input == '1') {
         return 1;
     }
-    if (_input == '2') {
+    if (_connected && _input == '2') {
         return 2;
     }
     return 0;
@@ -53,11 +56,25 @@ void Menu::showPage() {
     _minitel->attributs(INVERSION_FOND);
     _minitel->print("1");
     _minitel->attributs(FOND_NORMAL);
-    _minitel->println(" - Selectionner WiFi");
+
+    if(!_connected) {
+        _minitel->println(" - Connexion à un réseau WiFi");
+        _minitel->attributs(CARACTERE_BLEU);
+        _minitel->moveCursorReturn(1);
+        _minitel->println("CONNEXION NECESSAIRE");
+    }
+    else {
+        _minitel->println(" - Options WiFi");
+    }
+    
     _minitel->attributs(INVERSION_FOND);
     _minitel->print("2");
     _minitel->attributs(FOND_NORMAL);
     _minitel->println(" - Client SSH");
+
+    if(!_connected) {
+        _minitel->attributs(CARACTERE_BLANC);
+    }
     _minitel->cursor();
     _minitel->print("Choix puis ");
     _minitel->attributs(INVERSION_FOND);

@@ -28,8 +28,11 @@ void controlTask(void *pvParameter) {
                 newDevState(STATE_HOME_MENU);
                 break;
             case STATE_HOME_MENU: {
-                Menu m(display.minitel());
-                ret = m.run();
+                Menu m(display.minitel(), WiFi.status() == WL_CONNECTED);
+                ret = 0;
+                while (ret == 0) {
+                    ret = m.run(WiFi.status() == WL_CONNECTED);
+                }
                 switch (ret) {
                     case 1:
                         newDevState(STATE_WIFI_MENU);
