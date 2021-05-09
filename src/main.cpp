@@ -3,6 +3,7 @@
 #include "pages/menu.h"
 #include "pages/WiFiMenu.h"
 #include "pages/sshPage.h"
+#include "pages/weather.h"
 #include <WiFi.h>
 
 #define NET_WAIT_MS 100
@@ -40,6 +41,9 @@ void controlTask(void *pvParameter) {
                     case 2:
                         newDevState(STATE_SSH);
                         break;
+                    case 3:
+                        newDevState(STATE_WEATHER);
+                        break;
                 }
                 break;
             }
@@ -52,6 +56,12 @@ void controlTask(void *pvParameter) {
             case STATE_SSH: {
                 SSHPage s(&display);
                 ret = s.run();
+                newDevState(STATE_HOME_MENU);
+                break;
+            }
+            case STATE_WEATHER: {
+                Weather w(display.minitel());
+                ret = w.run();
                 newDevState(STATE_HOME_MENU);
                 break;
             }

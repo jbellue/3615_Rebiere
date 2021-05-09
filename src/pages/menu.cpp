@@ -5,28 +5,28 @@ uint8_t Menu::run(bool connected) {
         _connected = connected;
         _state = STATE_NEW;
     }
-        switch (_state) {
-            case STATE_NEW:
-                showPage();
-                _state = STATE_WAITING_FOR_INPUT;
-                break;
-            case STATE_WAITING_FOR_INPUT:
-                if (getInput()) {
-                    _state = STATE_CHECK_INPUT;
-                    _minitel->moveCursorReturn(1);
-                    _minitel->noCursor();
-                }
-                break;
-            case STATE_CHECK_INPUT:
-                const uint8_t newPage = checkInput();
-                if (!newPage) {
-                    _state = STATE_NEW;
-                }
-                else {
-                    return newPage;
-                }
-                break;
-        }
+    switch (_state) {
+        case STATE_NEW:
+            showPage();
+            _state = STATE_WAITING_FOR_INPUT;
+            break;
+        case STATE_WAITING_FOR_INPUT:
+            if (getInput()) {
+                _state = STATE_CHECK_INPUT;
+                _minitel->moveCursorReturn(1);
+                _minitel->noCursor();
+            }
+            break;
+        case STATE_CHECK_INPUT:
+            const uint8_t newPage = checkInput();
+            if (!newPage) {
+                _state = STATE_NEW;
+            }
+            else {
+                return newPage;
+            }
+            break;
+    }
     return 0;
 }
 
@@ -36,6 +36,9 @@ uint8_t Menu::checkInput() {
     }
     if (_connected && _input == '2') {
         return 2;
+    }
+    if (_connected && _input == '3') {
+        return 3;
     }
     return 0;
 }
@@ -71,6 +74,11 @@ void Menu::showPage() {
     _minitel->print("2");
     _minitel->attributs(FOND_NORMAL);
     _minitel->println(" - Client SSH");
+    
+    _minitel->attributs(INVERSION_FOND);
+    _minitel->print("3");
+    _minitel->attributs(FOND_NORMAL);
+    _minitel->println(" - Météo");
 
     if(!_connected) {
         _minitel->attributs(CARACTERE_BLANC);

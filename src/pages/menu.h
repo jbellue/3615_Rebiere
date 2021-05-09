@@ -6,11 +6,12 @@
 
 class Menu {
     public:
-    Menu(Minitel* m) :
+    Menu(Minitel* m, bool connected) :
         _minitel(m),
         _state(STATE_NEW),
-        _input('\0') { }
-    uint8_t run();
+        _input('\0'),
+        _connected(connected) { }
+    uint8_t run(bool connected);
     private:
     void showPage();
     uint8_t getInput();
@@ -26,6 +27,7 @@ class Menu {
     State _state;
 
     char _input;
+    bool _connected;
 };
 
 #endif

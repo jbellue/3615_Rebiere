@@ -10,7 +10,7 @@ typedef enum {
     STATE_HOME_MENU,
     STATE_WIFI_MENU,
     STATE_SSH,
-    STATE_CLEANUP
+    STATE_WEATHER
 } devState_t;
 
 int show_remote_processes(ssh_session session);
