@@ -9,6 +9,10 @@ Weather::Weather(Minitel* m) {
 }
 
 uint8_t Weather::run() {
+    showConnectingPage();
+    _weather.init();
+    _maxPage = _weather.maxPage();
+
     while(true) {
         switch (_state) {
             case STATE_NEW:
@@ -27,6 +31,11 @@ uint8_t Weather::run() {
             }
         }
     }
+}
+
+void Weather::showConnectingPage() {
+    showTitle();
+    _minitel->println("Connexion au service de météo...");
 }
 
 void Weather::setDayName(char* buffer, const uint8_t i) {
@@ -96,7 +105,7 @@ void Weather::setMonthName(char* buffer, const uint8_t i) {
     }
 }
 
-void Weather::showPage() {
+void Weather::showTitle() {
     _minitel->noCursor();
     _minitel->newScreen();
     _minitel->attributs(DOUBLE_HAUTEUR);
@@ -107,7 +116,11 @@ void Weather::showPage() {
     for (int i = 1; i <= 40; i++) {
         _minitel->writeByte(0x7E);
     }
+}
 
+
+void Weather::showPage() {
+    showTitle();
     WeatherClient::weatherData w = _weather.get(_weatherPage);
     if (w.weatherID == -1) {
         _minitel->println("Erreur");
@@ -123,7 +136,8 @@ void Weather::showPage() {
         sprintf(buffer, "Météo du %s %d %s %d :", dayName, timeinfo->tm_mday, monthName, timeinfo->tm_year + 1900);
 
         _minitel->println(buffer);
-        _minitel->println(w.description);
+        _minitel->moveCursorReturn(1);
+
         sprintf(buffer, "Température : %.1f°C", w.temperature);
         _minitel->println(buffer);
 
@@ -136,13 +150,13 @@ void Weather::showPage() {
         sprintf(buffer, "Vitesse du vent : %dkm/h", w.windSpeed);
         _minitel->println(buffer);
 
-        sprintf(buffer, "Taux d'ennuagement : %d%%", w.cloudiness);
+        sprintf(buffer, "Nébulosité : %d%%", w.cloudiness);
         _minitel->println(buffer);
 
         sprintf(buffer, "Risque de pluie : %d%%", w.precipitationChance);
         _minitel->println(buffer);
 
-        // _minitel->println(w.weatherID);
+        _minitel->println(w.description);
     }
 }
 

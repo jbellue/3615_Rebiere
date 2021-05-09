@@ -11,7 +11,9 @@ public:
     uint8_t run();
 
 private:
+    void showConnectingPage();
     void showPage();
+    void showTitle();
 
     WeatherClient _weather;
     int8_t _weatherPage;
