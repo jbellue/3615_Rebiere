@@ -240,6 +240,29 @@ void Weather::displayWeatherConditions(const uint8_t x, const uint8_t y, Weather
     _minitel->print(w->description);
 }
 
+void Weather::displayBottomMenu() {
+    _minitel->moveCursorXY(0, 24);
+    _minitel->attributs(INVERSION_FOND);
+    _minitel->print("Retour");
+    _minitel->attributs(FOND_NORMAL);
+    _minitel->print(" <      ");
+    for(uint8_t page = 0; page < _maxPage; ++page) {
+        if (page == _weatherPage) {
+            _minitel->attributs(INVERSION_FOND);
+        }
+        _minitel->print((String)(page + 1));
+        if (page == _weatherPage) {
+            _minitel->attributs(FOND_NORMAL);
+        }
+        _minitel->print(" ");
+    }
+
+    _minitel->print("     > ");
+    _minitel->attributs(INVERSION_FOND);
+    _minitel->print("Suite");
+    _minitel->attributs(FOND_NORMAL);
+}
+
 void Weather::showPage() {
     showTitle();
     WeatherClient::weatherData w = _weather.get(_weatherPage);
@@ -262,6 +285,7 @@ void Weather::showPage() {
         const uint8_t x = 18;
         const uint8_t y = 8;
         displayWeatherConditions(x, y, &w);
+        displayBottomMenu();
     }
 }
 

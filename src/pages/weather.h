@@ -31,6 +31,7 @@ private:
 
     void drawWeatherSymbol(const uint16_t id);
     void displayWeatherConditions(const uint8_t x, const uint8_t y, WeatherClient::weatherData* w);
+    void displayBottomMenu();
 
     enum State {
         STATE_NEW,
