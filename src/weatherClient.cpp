@@ -17,10 +17,17 @@ bool WeatherClient::init() {
             ret = false;
         }
         else {
-            _forecastCount = 7;
-            ret = true;
+            JsonVariant errorCode = _doc["cod"];
+            if (!errorCode.isNull()) {
+                // check the error message : 
+                // const char* message = doc["message"];
+                ret = false;
+            }
+            else {
+                _forecastCount = 7;
+                ret = true;
+            }
         }
-
     }
     else {
         // _minitel->print("Erreur de connexion : ");

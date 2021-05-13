@@ -9,7 +9,11 @@ Weather::Weather(Minitel* m) {
 
 uint8_t Weather::run() {
     showConnectingPage();
-    _weather.init();
+    if (!_weather.init()) {
+        _minitel->println("Impossible de se connecter au serveur météo.");
+        delay(2000);
+        return 0;
+    }
     _maxPage = _weather.maxPage();
 
     while(true) {
