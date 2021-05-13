@@ -118,7 +118,6 @@ void Weather::showTitle() {
 }
 
 void Weather::sendBytes(const uint8_t* bytes, const uint16_t size) {
-    _minitel->noCursor();
     for (uint16_t i = 0; i < size; ++i) {
         _minitel->writeByte(bytes[i]);
     }
