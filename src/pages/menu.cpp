@@ -1,6 +1,32 @@
 #include "menu.h"
 
-uint8_t Menu::run(bool connected) {
+Menu::Menu(Minitel* m, bool connected) {
+    _minitel = m;
+    _state = STATE_NEW;
+    _input = '\0';
+    _connected = connected;
+
+    initMenuItems();
+}
+
+void Menu::initMenuItems() {
+    _itemsCount = 3;
+    _items = new MenuItem[_itemsCount];
+    _items[0]._name = "Options WiFi";
+    _items[0]._unconnectedName = "Connexion à un réseau WiFi";
+    _items[0].needsConnection(false);
+    _items[0].id = MenuItem::WIFI_MENU;
+
+    _items[1]._name = "Météo";
+    _items[1].needsConnection(true);
+    _items[1].id = MenuItem::WEATHER;
+
+    _items[2]._name = "Client SSH";
+    _items[2].needsConnection(true);
+    _items[2].id = MenuItem::SSH;
+}
+
+MenuItem::MenuOutput Menu::run(bool connected) {
     if (connected != _connected) {
         _connected = connected;
         _state = STATE_NEW;
@@ -18,8 +44,8 @@ uint8_t Menu::run(bool connected) {
             }
             break;
         case STATE_CHECK_INPUT:
-            const uint8_t newPage = checkInput();
-            if (!newPage) {
+            const MenuItem::MenuOutput newPage = checkInput();
+            if (newPage == MenuItem::NONE) {
                 _state = STATE_NEW;
             }
             else {
@@ -27,20 +53,17 @@ uint8_t Menu::run(bool connected) {
             }
             break;
     }
-    return 0;
+    return MenuItem::NONE;
 }
 
-uint8_t Menu::checkInput() {
-    if (_input == '1') {
-        return 1;
+MenuItem::MenuOutput Menu::checkInput() {
+    for(uint8_t i = 0; i < _itemsCount; ++i) {
+        // poor man's atoi
+        if (_input - '0' == _items[i].id) {
+            return _items[i].id;
+        }
     }
-    if (_connected && _input == '2') {
-        return 2;
-    }
-    if (_connected && _input == '3') {
-        return 3;
-    }
-    return 0;
+    return MenuItem::NONE;
 }
 
 void Menu::showPage() {
@@ -55,34 +78,25 @@ void Menu::showPage() {
         _minitel->writeByte(0x7E);
     }
 
-    _minitel->moveCursorDown(1);
-    _minitel->attributs(INVERSION_FOND);
-    _minitel->print("1");
-    _minitel->attributs(FOND_NORMAL);
+    _minitel->moveCursorReturn(2);
 
-    if(!_connected) {
-        _minitel->println(" - Connexion à un réseau WiFi");
-        _minitel->attributs(CARACTERE_BLEU);
-        _minitel->moveCursorReturn(1);
-        _minitel->println("CONNEXION NECESSAIRE");
-    }
-    else {
-        _minitel->println(" - Options WiFi");
-    }
-    
-    _minitel->attributs(INVERSION_FOND);
-    _minitel->print("2");
-    _minitel->attributs(FOND_NORMAL);
-    _minitel->println(" - Client SSH");
-    
-    _minitel->attributs(INVERSION_FOND);
-    _minitel->print("3");
-    _minitel->attributs(FOND_NORMAL);
-    _minitel->println(" - Météo");
-
-    if(!_connected) {
+    for(uint8_t i = 0; i < _itemsCount; ++i) {
+        _minitel->attributs(INVERSION_FOND);
+        if(!_connected && _items[i].needsConnection()) {
+            _minitel->attributs(CARACTERE_BLEU);
+            _minitel->print("X");
+        }
+        else {
+            _minitel->print(String(_items[i].id));
+        }
+        _minitel->attributs(FOND_NORMAL);
+        _minitel->print(" - ");
+        _minitel->println(_items[i]._name);
         _minitel->attributs(CARACTERE_BLANC);
     }
+
+    _minitel->moveCursorReturn(2);
+
     _minitel->cursor();
     _minitel->print("Choix puis ");
     _minitel->attributs(INVERSION_FOND);

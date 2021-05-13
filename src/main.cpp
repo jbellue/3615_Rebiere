@@ -20,7 +20,6 @@ void controlTask(void *pvParameter) {
     Display display;
 
     vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
-    uint8_t ret = 0;
 
     while(1) {
         switch(devState) {
@@ -30,38 +29,41 @@ void controlTask(void *pvParameter) {
                 break;
             case STATE_HOME_MENU: {
                 Menu m(display.minitel(), WiFi.status() == WL_CONNECTED);
-                ret = 0;
-                while (ret == 0) {
-                    ret = m.run(WiFi.status() == WL_CONNECTED);
+                MenuItem::MenuOutput choice = MenuItem::NONE;
+                while (choice == MenuItem::NONE) {
+                    choice = m.run(WiFi.status() == WL_CONNECTED);
                 }
-                switch (ret) {
-                    case 1:
+                switch (choice) {
+                    case MenuItem::WIFI_MENU:
                         newDevState(STATE_WIFI_MENU);
                         break;
-                    case 2:
+                    case MenuItem::WEATHER:
+                        newDevState(STATE_WEATHER);
+                        break;
+                    case MenuItem::SSH:
                         newDevState(STATE_SSH);
                         break;
-                    case 3:
-                        newDevState(STATE_WEATHER);
+                    default:
+                        // ignore
                         break;
                 }
                 break;
             }
             case STATE_WIFI_MENU: {
                 WiFiMenu m(display.minitel());
-                ret = m.run();
+                m.run();
                 newDevState(STATE_HOME_MENU);
                 break;
             }
             case STATE_SSH: {
                 SSHPage s(&display);
-                ret = s.run();
+                s.run();
                 newDevState(STATE_HOME_MENU);
                 break;
             }
             case STATE_WEATHER: {
                 Weather w(display.minitel());
-                ret = w.run();
+                w.run();
                 newDevState(STATE_HOME_MENU);
                 break;
             }
