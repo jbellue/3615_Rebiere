@@ -12,7 +12,7 @@ public:
 
     struct weatherData {
         long timestamp;
-        int weatherID;
+        uint16_t weatherID;
         float temperature;
         float feelsLikeTemperature;
         uint8_t humidity;

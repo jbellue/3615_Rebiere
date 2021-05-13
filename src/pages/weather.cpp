@@ -1,11 +1,10 @@
 #include "weather.h"
+#include "asciiImages.h"
 
 Weather::Weather(Minitel* m) {
     _minitel = m;
     _state = STATE_NEW;
-    _weather.init();
     _weatherPage = 0;
-    _maxPage = _weather.maxPage();
 }
 
 uint8_t Weather::run() {
@@ -118,6 +117,128 @@ void Weather::showTitle() {
     }
 }
 
+void Weather::sendBytes(const uint8_t* bytes, const uint16_t size) {
+    _minitel->noCursor();
+    for (uint16_t i = 0; i < size; ++i) {
+        _minitel->writeByte(bytes[i]);
+    }
+}
+
+void Weather::drawWeatherSymbol(const uint16_t id) {
+    // c.f. https://openweathermap.org/weather-conditions
+    switch(id) {
+        case 200:
+        case 201:
+        case 202:
+        case 210:
+        case 211:
+        case 212:
+        case 221:
+        case 230:
+        case 231:
+        case 232:
+            sendBytes(thunderstorm, thunderstormSize);
+            break;
+        case 300:
+        case 301:
+        case 302:
+        case 310:
+        case 311:
+        case 312:
+        case 313:
+        case 314:
+        case 321:
+        case 520:
+        case 521:
+        case 522:
+        case 531:
+            sendBytes(showerRain, showerRainSize);
+            break;
+        case 500:
+        case 501:
+        case 502:
+        case 503:
+        case 504:
+            sendBytes(rain, rainSize);
+            break;
+        case 511:
+        case 600:
+        case 601:
+        case 602:
+        case 611:
+        case 612:
+        case 613:
+        case 615:
+        case 616:
+        case 620:
+        case 621:
+        case 622:
+            sendBytes(snow, snowSize);
+            break;
+        case 701:
+        case 711:
+        case 721:
+        case 731:
+        case 741:
+        case 751:
+        case 761:
+        case 762:
+        case 771:
+        case 781:
+            sendBytes(atmosphere, atmosphereSize);
+            break;
+        case 800:
+            sendBytes(clearSky, clearSkySize);
+            break;
+        case 801:
+            sendBytes(fewClouds, fewCloudsSize);
+            break;
+        case 802:
+            sendBytes(scatteredClouds, scatteredCloudsSize);
+            break;
+        case 803:
+        case 804:
+            sendBytes(brokenClouds, brokenCloudsSize);
+            break;
+    }
+}
+
+void Weather::displayWeatherConditions(const uint8_t x, const uint8_t y, WeatherClient::weatherData* w) {
+    uint8_t menuY = y;
+    const uint8_t bufferSize = 50;
+    char buffer[bufferSize];
+
+    _minitel->textMode();
+    _minitel->attributs(CARACTERE_BLANC);
+    _minitel->attributs(FOND_NOIR);
+
+    sprintf(buffer, "Température : %.1f°C", w->temperature);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Ressentie : %.1f°C", w->feelsLikeTemperature);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Humidité : %d%%", w->humidity);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Vitesse du vent : %dkm/h", w->windSpeed);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Nébulosité : %d%%", w->cloudiness);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Risque de pluie : %d%%", w->precipitationChance);
+    _minitel->moveCursorXY(x, menuY);
+    _minitel->print(buffer);
+
+    _minitel->moveCursorXY(2, menuY + 6);
+    _minitel->print(w->description);
+}
 
 void Weather::showPage() {
     showTitle();
@@ -131,32 +252,16 @@ void Weather::showPage() {
         setDayName(dayName, timeinfo->tm_wday);
         char monthName[10];
         setMonthName(monthName, timeinfo->tm_mon);
+
         const uint8_t bufferSize = 50;
         char buffer[bufferSize];
         sprintf(buffer, "Météo du %s %d %s %d :", dayName, timeinfo->tm_mday, monthName, timeinfo->tm_year + 1900);
-
-        _minitel->println(buffer);
-        _minitel->moveCursorReturn(1);
-
-        sprintf(buffer, "Température : %.1f°C", w.temperature);
         _minitel->println(buffer);
 
-        sprintf(buffer, "Température ressentie : %.1f°C", w.feelsLikeTemperature);
-        _minitel->println(buffer);
-
-        sprintf(buffer, "Humidité : %d%%", w.humidity);
-        _minitel->println(buffer);
-
-        sprintf(buffer, "Vitesse du vent : %dkm/h", w.windSpeed);
-        _minitel->println(buffer);
-
-        sprintf(buffer, "Nébulosité : %d%%", w.cloudiness);
-        _minitel->println(buffer);
-
-        sprintf(buffer, "Risque de pluie : %d%%", w.precipitationChance);
-        _minitel->println(buffer);
-
-        _minitel->println(w.description);
+        drawWeatherSymbol(w.weatherID);
+        const uint8_t x = 18;
+        const uint8_t y = 8;
+        displayWeatherConditions(x, y, &w);
     }
 }
 
