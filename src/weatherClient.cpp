@@ -53,7 +53,8 @@ WeatherClient::weatherData WeatherClient::get(const uint8_t i) {
         _w.cloudiness = _doc["current"]["clouds"];
         _w.windSpeed = _doc["current"]["wind_speed"];
 
-        //use daily as pop isn't in current
+        //use daily for fields thant aren't in current
+        _w.rainfall = _doc["daily"][0]["rain"];
         float pop = _doc["daily"][0]["pop"];
         _w.precipitationChance = pop * 100;
     }
@@ -66,6 +67,7 @@ WeatherClient::weatherData WeatherClient::get(const uint8_t i) {
         _w.humidity = _doc["daily"][i]["humidity"];
         _w.cloudiness = _doc["daily"][i]["clouds"];
         _w.windSpeed = _doc["daily"][i]["wind_speed"];
+        _w.rainfall = _doc["daily"][i]["rain"];
         float pop = _doc["daily"][i]["pop"];
         _w.precipitationChance = pop * 100;
     }

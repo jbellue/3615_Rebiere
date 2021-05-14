@@ -19,6 +19,7 @@ public:
         uint8_t cloudiness;
         uint8_t windSpeed;
         uint8_t precipitationChance;
+        float rainfall;
         char* description;
     };
     weatherData get(const uint8_t);

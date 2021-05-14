@@ -236,6 +236,10 @@ void Weather::displayWeatherConditions(const uint8_t x, const uint8_t y, Weather
     _minitel->print(buffer);
 
     sprintf(buffer, "Risque de pluie : %d%%", w->precipitationChance);
+    _minitel->moveCursorXY(x, menuY++);
+    _minitel->print(buffer);
+
+    sprintf(buffer, "Pluviométrie : %.2fmm", w->rainfall);
     _minitel->moveCursorXY(x, menuY);
     _minitel->print(buffer);
 
