@@ -10,10 +10,10 @@
 
 const unsigned int configSTACK = 51200;
 
-static volatile devState_t devState;
+static volatile state_t state;
 
-void newDevState(devState_t s) {
-    devState = s;
+void newState(state_t s) {
+    state = s;
 }
 
 void controlTask(void *pvParameter) {
@@ -22,10 +22,10 @@ void controlTask(void *pvParameter) {
     vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
 
     while(1) {
-        switch(devState) {
+        switch(state) {
             case STATE_NEW:
                 vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
-                newDevState(STATE_HOME_MENU);
+                newState(STATE_HOME_MENU);
                 break;
             case STATE_HOME_MENU: {
                 Menu m(display.minitel(), WiFi.status() == WL_CONNECTED);
@@ -35,13 +35,13 @@ void controlTask(void *pvParameter) {
                 }
                 switch (choice) {
                     case MenuItem::WIFI_MENU:
-                        newDevState(STATE_WIFI_MENU);
+                        newState(STATE_WIFI_MENU);
                         break;
                     case MenuItem::WEATHER:
-                        newDevState(STATE_WEATHER);
+                        newState(STATE_WEATHER);
                         break;
                     case MenuItem::SSH:
-                        newDevState(STATE_SSH);
+                        newState(STATE_SSH);
                         break;
                     default:
                         // ignore
@@ -52,19 +52,19 @@ void controlTask(void *pvParameter) {
             case STATE_WIFI_MENU: {
                 WiFiMenu m(display.minitel());
                 m.run();
-                newDevState(STATE_HOME_MENU);
+                newState(STATE_HOME_MENU);
                 break;
             }
             case STATE_SSH: {
                 SSHPage s(&display);
                 s.run();
-                newDevState(STATE_HOME_MENU);
+                newState(STATE_HOME_MENU);
                 break;
             }
             case STATE_WEATHER: {
                 Weather w(display.minitel());
                 w.run();
-                newDevState(STATE_HOME_MENU);
+                newState(STATE_HOME_MENU);
                 break;
             }
             default:
@@ -74,7 +74,7 @@ void controlTask(void *pvParameter) {
 }
 
 void setup() {
-    devState = STATE_NEW;
+    state = STATE_NEW;
     xTaskCreatePinnedToCore(controlTask, "control", configSTACK, NULL, (tskIDLE_PRIORITY + 3), NULL, portNUM_PROCESSORS - 1);
     WiFi.begin();
 }
