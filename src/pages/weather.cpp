@@ -1,5 +1,6 @@
 #include "weather.h"
 #include "asciiImages.h"
+#include "utils.h"
 
 Weather::Weather(Minitel* m) {
     _minitel = m;
@@ -243,7 +244,14 @@ void Weather::displayWeatherConditions(const uint8_t x, const uint8_t y, Weather
     _minitel->moveCursorXY(x, menuY);
     _minitel->print(buffer);
 
-    _minitel->moveCursorXY(2, menuY + 6);
+    const size_t descriptionCharactersCount = characterCount(w->description);
+
+    uint8_t menuX = 0;
+    if(descriptionCharactersCount < 18) {
+        const uint8_t iconCenter = 9;
+        menuX = iconCenter - descriptionCharactersCount / 2;
+    }
+    _minitel->moveCursorXY(menuX, menuY + 6);
     _minitel->print(w->description);
 }
 
