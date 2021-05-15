@@ -18,7 +18,6 @@ private:
     };
     void showPage();
     Input getInput();
-    uint8_t checkInput();
 
     enum State {
         STATE_NEW,

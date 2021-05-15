@@ -61,13 +61,6 @@ uint8_t SSHPage::run() {
     }
 }
 
-uint8_t SSHPage::checkInput() {
-    _display->minitel()->moveCursorXY(0, 20);
-    _display->minitel()->println(_inputs[0]);
-    _display->minitel()->println(_inputs[1]);
-    _display->minitel()->println(_inputs[2]);
-    return 0;
-}
 void SSHPage::showPage() {
     _display->minitel()->noCursor();
     _display->minitel()->newScreen();
