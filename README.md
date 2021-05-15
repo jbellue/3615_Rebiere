@@ -13,8 +13,18 @@ If the build fails because of:
 
 edit file `~/.platformio/packages/framework-arduinoespressif32/cores/esp32/IPAddress.h` and comment out the line `const IPAddress INADDR_NONE(0, 0, 0, 0);`
 
+## GETTING STARTED
+
+On first run, you can set the default parameters by uncommenting the block
+
+```C++
+// preferences.putString("openWeatherKey", "xxxxxxxxxxxxxxxxxxxxxxxxx");
+// preferences.putFloat("locationLat", 0.0000);
+// preferences.putFloat("locationLon", 0.0000);
+```
+
 ## TODO
 
 - Add some error mechanism to have errors bubble up in clients (weatherClient and SSHClient so far)
-- Allow setting latitude and longitude in weather page
+- Allow setting latitude and longitude in weather page (and API key?)
 - Add a smart home page (probably an MQTT client?)
