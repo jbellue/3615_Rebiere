@@ -5,8 +5,11 @@
 #include "pages/sshPage.h"
 #include "pages/weather.h"
 #include <WiFi.h>
+#include <Preferences.h>
 
 #define NET_WAIT_MS 100
+
+Preferences preferences;
 
 const unsigned int configSTACK = 51200;
 
@@ -75,6 +78,13 @@ void controlTask(void *pvParameter) {
 
 void setup() {
     state = STATE_NEW;
+    preferences.begin("3615");
+
+    // Initialize the preferences only once:
+    // preferences.putString("openWeatherKey", "xxxxxxxxxxxxxxxxxxxxxxxxx");
+    // preferences.putFloat("locationLat", 0.0000);
+    // preferences.putFloat("locationLon", 0.0000);
+
     xTaskCreatePinnedToCore(controlTask, "control", configSTACK, NULL, (tskIDLE_PRIORITY + 3), NULL, portNUM_PROCESSORS - 1);
     WiFi.begin();
 }

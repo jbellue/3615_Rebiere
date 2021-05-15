@@ -1,11 +1,16 @@
 #include "weatherClient.h"
-#include "secret.h"
+#include <Preferences.h>
+
+extern Preferences preferences;
 
 bool WeatherClient::init() {
     bool ret = false;
     HTTPClient http;
     char urlBuffer[256];
-    sprintf(urlBuffer, "https://api.openweathermap.org/data/2.5/onecall?lat=%.4f&lon=%.4f&units=metric&lang=fr&exclude=minutely,hourly,alert&appid=%s", locationLat, locationLon, APIKey);
+    sprintf(urlBuffer, "https://api.openweathermap.org/data/2.5/onecall?lat=%.4f&lon=%.4f&units=metric&lang=fr&exclude=minutely,hourly,alert&appid=%s", 
+            preferences.getFloat("locationLat", 0.00),
+            preferences.getFloat("locationLon", 0.00),
+            preferences.getString("openWeatherKey").c_str());
     http.begin(String(urlBuffer));
     const int httpResponseStatus = http.GET();
     if (httpResponseStatus > 0) {
