@@ -7,7 +7,7 @@
 class WeatherClient {
 public:
     WeatherClient() :
-        _doc(6144) {};
+        _doc(3072) {};
     bool init();
 
     struct weatherData {

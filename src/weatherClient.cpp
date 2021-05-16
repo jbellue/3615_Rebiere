@@ -15,7 +15,39 @@ bool WeatherClient::init() {
     http.begin(String(urlBuffer));
     const int httpResponseStatus = http.GET();
     if (httpResponseStatus > 0) {
-        DeserializationError error = deserializeJson(_doc, http.getStream());
+        StaticJsonDocument<1872> filter;
+
+        JsonObject filter_current = filter.createNestedObject("current");
+        filter_current["dt"] = true;
+        filter_current["temp"] = true;
+        filter_current["feels_like"] = true;
+        filter_current["humidity"] = true;
+        filter_current["clouds"] = true;
+        filter_current["wind_speed"] = true;
+
+        JsonObject filter_current_weather_0 = filter_current["weather"].createNestedObject();
+        filter_current_weather_0["id"] = true;
+        filter_current_weather_0["description"] = true;
+
+        JsonArray filter_daily = filter.createNestedArray("daily");
+
+        for(uint8_t i = 0; i < 7; ++i) {
+            JsonObject daily = filter_daily.createNestedObject();
+            daily["dt"] = true;
+            daily["temp"]["day"] = true;
+            daily["feels_like"]["day"] = true;
+            daily["humidity"] = true;
+            daily["wind_speed"] = true;
+
+            JsonObject filter_daily_i_weather_0 = daily["weather"].createNestedObject();
+            filter_daily_i_weather_0["id"] = true;
+            filter_daily_i_weather_0["description"] = true;
+            daily["clouds"] = true;
+            daily["pop"] = true;
+            daily["rain"] = true;
+        }
+
+        DeserializationError error = deserializeJson(_doc, http.getStream(), DeserializationOption::Filter(filter));
 
         if (error) {
             // _minitel->print(F("deserializeJson() failed: "));
