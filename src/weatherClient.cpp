@@ -15,7 +15,7 @@ bool WeatherClient::init() {
     http.begin(String(urlBuffer));
     const int httpResponseStatus = http.GET();
     if (httpResponseStatus > 0) {
-        StaticJsonDocument<1872> filter;
+        DynamicJsonDocument filter(1872);
 
         JsonObject filter_current = filter.createNestedObject("current");
         filter_current["dt"] = true;
