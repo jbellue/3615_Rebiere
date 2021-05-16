@@ -26,6 +26,6 @@ On first run, you can set the default parameters by uncommenting the block
 ## TODO
 
 - Add some error mechanism to have errors bubble up in clients (weatherClient and SSHClient so far)
-- Allow setting latitude and longitude in weather page
+- Filter out useless data in weatherClient json result
 - Add a smart home page (probably an MQTT client?)
 - Add a settings page (for now, to set the API keys)

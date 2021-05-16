@@ -23,6 +23,7 @@ private:
     enum Input {
         GO_TO_SOMMAIRE,
         GO_TO_NEW_PAGE,
+        GO_TO_SETTINGS,
         GO_TO_STAY
     };
     Input getInput();

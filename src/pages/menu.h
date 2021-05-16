@@ -13,7 +13,8 @@ class MenuItem {
         NONE = 0,
         WIFI_MENU,
         WEATHER,
-        SSH
+        SSH,
+        SETTINGS
     };
 
     void needsConnection(bool b) {_needsConnected = b;}

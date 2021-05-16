@@ -4,6 +4,7 @@
 #include "pages/WiFiMenu.h"
 #include "pages/sshPage.h"
 #include "pages/weather.h"
+#include "pages/settings.h"
 #include <WiFi.h>
 #include <Preferences.h>
 
@@ -46,6 +47,9 @@ void controlTask(void *pvParameter) {
                     case MenuItem::SSH:
                         newState(STATE_SSH);
                         break;
+                    case MenuItem::SETTINGS:
+                        newState(STATE_SETTINGS);
+                        break;
                     default:
                         // ignore
                         break;
@@ -66,9 +70,19 @@ void controlTask(void *pvParameter) {
             }
             case STATE_WEATHER: {
                 Weather w(display.minitel());
-                w.run();
-                newState(STATE_HOME_MENU);
+                uint8_t ret = w.run();
+                if(ret == 0) {
+                    newState(STATE_HOME_MENU);
+                }
+                else if (ret == 1) {
+                    newState(STATE_SETTINGS);
+                }
                 break;
+            }
+            case STATE_SETTINGS: {
+                Settings s(display.minitel());
+                s.run();
+                newState(STATE_HOME_MENU);
             }
             default:
                 break;

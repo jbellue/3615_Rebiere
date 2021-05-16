@@ -6,6 +6,7 @@ extern Preferences preferences;
 bool WeatherClient::init() {
     bool ret = false;
     HTTPClient http;
+    http.useHTTP10(true);
     char urlBuffer[256];
     sprintf(urlBuffer, "https://api.openweathermap.org/data/2.5/onecall?lat=%.4f&lon=%.4f&units=metric&lang=fr&exclude=minutely,hourly,alert&appid=%s", 
             preferences.getFloat("locationLat", 0.00),

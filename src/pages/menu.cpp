@@ -10,7 +10,7 @@ Menu::Menu(Minitel* m, bool connected) {
 }
 
 void Menu::initMenuItems() {
-    _itemsCount = 3;
+    _itemsCount = 4;
     _items = new MenuItem[_itemsCount];
     _items[0]._name = "Options WiFi";
     _items[0]._unconnectedName = "Connexion à un réseau WiFi";
@@ -24,6 +24,10 @@ void Menu::initMenuItems() {
     _items[2]._name = "Client SSH";
     _items[2].needsConnection(true);
     _items[2].id = MenuItem::SSH;
+
+    _items[3]._name = "Localisation pour la météo";
+    _items[3].needsConnection(false);
+    _items[3].id = MenuItem::SETTINGS;
 }
 
 MenuItem::MenuOutput Menu::run(bool connected) {

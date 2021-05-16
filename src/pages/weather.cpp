@@ -31,6 +31,9 @@ uint8_t Weather::run() {
                 else if (i == GO_TO_SOMMAIRE) {
                     return 0;
                 }
+                else if (i == GO_TO_SETTINGS) {
+                    return 1;
+                }
                 break;
             }
         }
@@ -256,7 +259,12 @@ void Weather::displayWeatherConditions(const uint8_t x, const uint8_t y, Weather
 }
 
 void Weather::displayBottomMenu() {
-    _minitel->moveCursorXY(0, 24);
+    _minitel->moveCursorXY(0, 23);
+    _minitel->attributs(INVERSION_FOND);
+    _minitel->print("Guide");
+    _minitel->attributs(FOND_NORMAL);
+    _minitel->println(" : Options"); 
+   
     _minitel->attributs(INVERSION_FOND);
     _minitel->print("Retour");
     _minitel->attributs(FOND_NORMAL);
@@ -328,6 +336,9 @@ Weather::Input Weather::getInput() {
                 --_weatherPage;
             }
             i = GO_TO_NEW_PAGE;
+            break;
+        case GUIDE:
+            i = GO_TO_SETTINGS;
             break;
         default:
             i = GO_TO_STAY;
