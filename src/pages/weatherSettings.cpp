@@ -1,12 +1,12 @@
 #include <Preferences.h>
-#include "settings.h"
+#include "weatherSettings.h"
 
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
 extern Preferences preferences;
 
-Settings::Settings(Minitel* m) {
+WeatherSettings::WeatherSettings(Minitel* m) {
     _minitel = m;
     _state = STATE_NEW;
     _inputs[0] = String(preferences.getFloat("locationLat", 0.00));
@@ -15,7 +15,7 @@ Settings::Settings(Minitel* m) {
     _errors[1] = false;
     _field = FIELD_TOWN;
 }
-uint8_t Settings::run() {
+uint8_t WeatherSettings::run() {
     while(true) {
         switch (_state)
         {
@@ -43,7 +43,7 @@ uint8_t Settings::run() {
     }
 }
 
-void Settings::showMessage(const char* msg, const uint8_t offset = 0, bool shouldWait = true) {
+void WeatherSettings::showMessage(const char* msg, const uint8_t offset = 0, bool shouldWait = true) {
     _minitel->moveCursorXY(0, 14 + offset);
     _minitel->println(String(msg));
 
@@ -53,7 +53,7 @@ void Settings::showMessage(const char* msg, const uint8_t offset = 0, bool shoul
     }
 }
 
-bool Settings::getCoordinatesFromSearch() {
+bool WeatherSettings::getCoordinatesFromSearch() {
     bool ret = false;
     HTTPClient http;
     http.useHTTP10(true);
@@ -97,7 +97,7 @@ bool Settings::getCoordinatesFromSearch() {
     return ret;
 }
 
-void Settings::showTitle() {
+void WeatherSettings::showTitle() {
     _minitel->noCursor();
     _minitel->newScreen();
     _minitel->attributs(DOUBLE_HAUTEUR);
@@ -110,7 +110,7 @@ void Settings::showTitle() {
     }
 }
 
-void Settings::showBottomMenu() {
+void WeatherSettings::showBottomMenu() {
     _minitel->moveCursorXY(0, 23);
     _minitel->attributs(INVERSION_FOND);
     _minitel->print("Envoi");
@@ -122,7 +122,7 @@ void Settings::showBottomMenu() {
     _minitel->println(" : Retour au menu");
 }
 
-void Settings::showPage() {
+void WeatherSettings::showPage() {
     showTitle();
 
     _minitel->moveCursorDown(1);
@@ -169,7 +169,7 @@ void Settings::showPage() {
     _minitel->moveCursorXY(0, 11);
 }
 
-bool Settings::saveInputs() {
+bool WeatherSettings::saveInputs() {
     float lon, lat;
     bool ret = true;
     char* endptr;
@@ -190,7 +190,7 @@ bool Settings::saveInputs() {
     return ret;
 }
 
-Settings::Input Settings::getInput() {
+WeatherSettings::Input WeatherSettings::getInput() {
     unsigned long key = _minitel->getKeyCode();
     _field = FIELD_TOWN;
     uint8_t x = 0,

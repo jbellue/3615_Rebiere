@@ -4,7 +4,7 @@
 #include "pages/WiFiMenu.h"
 #include "pages/sshPage.h"
 #include "pages/weather.h"
-#include "pages/settings.h"
+#include "pages/weatherSettings.h"
 #include <WiFi.h>
 #include <Preferences.h>
 
@@ -80,8 +80,8 @@ void controlTask(void *pvParameter) {
                 break;
             }
             case STATE_SETTINGS: {
-                Settings s(display.minitel());
-                s.run();
+                WeatherSettings w(display.minitel());
+                w.run();
                 newState(STATE_HOME_MENU);
             }
             default:

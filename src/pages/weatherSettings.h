@@ -4,9 +4,9 @@
 #include <Arduino.h>
 #include <Minitel1B_Hard.h>
 
-class Settings {
+class WeatherSettings {
 public:
-    Settings(Minitel* m);
+    WeatherSettings(Minitel* m);
     uint8_t run();
 
 private:
