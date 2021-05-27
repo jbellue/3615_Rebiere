@@ -106,6 +106,7 @@ void controlTask(void *pvParameter) {
                     break;
                 case MenuItem::MenuOutput::HOME:
                     newState(STATE_HOME_MENU);
+                    break;
                 default:
                     // ignore
                     break;

@@ -8,7 +8,6 @@ class Menu : public Page {
     public:
     Menu(Minitel* m, bool connected);
     MenuItem::MenuOutput run(bool connected);
-    virtual ~Menu() = default;
 
     private:
     void showPage();

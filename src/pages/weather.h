@@ -9,7 +9,6 @@ class Weather : public Page {
 public:
     Weather(Minitel* m);
     MenuItem::MenuOutput run(bool connected);
-    virtual ~Weather() = default;
 
 private:
     void showConnectingPage();

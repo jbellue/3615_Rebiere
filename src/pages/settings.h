@@ -8,8 +8,7 @@ class Settings : public Page {
 public:
     Settings(Minitel* m);
     MenuItem::MenuOutput run(bool connected);
-    virtual ~Settings() = default;
-
+    
 private:
     void showTitle();
     void showPage();

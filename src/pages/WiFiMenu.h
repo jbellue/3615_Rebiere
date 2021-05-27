@@ -16,7 +16,6 @@ public:
         Page {m},
         _state(STATE_NEW),
         _input('\0') { _connectionRetryCount = 0; }
-    virtual ~WiFiMenu() = default;
 
     MenuItem::MenuOutput run(bool connected);
 
