@@ -6,8 +6,8 @@
 
 class WeatherClient {
 public:
-    WeatherClient() :
-        _doc(3072) {};
+    WeatherClient() {};
+    ~WeatherClient();
     bool init();
 
     struct weatherData {
@@ -26,9 +26,10 @@ public:
     uint8_t maxPage();
 
 private:
-    DynamicJsonDocument _doc;
-    uint8_t _forecastCount;
+    const uint8_t _forecastCount = 7;
     weatherData _w;
+    void storeWeatherData(DynamicJsonDocument doc);
+    weatherData _data[7];
 };
 
 #endif
