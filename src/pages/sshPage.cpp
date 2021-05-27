@@ -1,6 +1,6 @@
 #include "pages/sshPage.h"
 
-MenuItem::MenuOutput SSHPage::run() {
+MenuItem::MenuOutput SSHPage::run(bool connected) {
     switch(_state) {
         case STATE_NEW:
             showPage();

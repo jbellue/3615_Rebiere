@@ -11,7 +11,7 @@ public:
         Page {m},
         _state(STATE_NEW),
         _sshClient(NULL) { }
-    MenuItem::MenuOutput run();
+    MenuItem::MenuOutput run(bool connected);
 
 private:
     enum Input {
