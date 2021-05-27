@@ -21,6 +21,7 @@ void newState(state_t s) {
 
 void controlTask(void *pvParameter) {
     Minitel minitel = Minitel(Serial);
+    minitel.changeSpeed(4800);
 
     vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
 
