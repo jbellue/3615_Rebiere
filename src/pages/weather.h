@@ -36,6 +36,7 @@ private:
     void displayBottomMenu();
 
     enum State {
+        STATE_INIT,
         STATE_NEW,
         STATE_WAITING_FOR_INPUT
     };

@@ -85,7 +85,11 @@ void controlTask(void *pvParameter) {
         }
 
         if (page) {
-            MenuItem::MenuOutput ret = page->run(WiFi.status() == WL_CONNECTED);
+            MenuItem::MenuOutput ret;
+            do {
+                ret = page->run(WiFi.status() == WL_CONNECTED);
+            }
+            while(ret == MenuItem::MenuOutput::NONE);
             switch (ret) {
                 case MenuItem::MenuOutput::WIFI_MENU:
                     newState(STATE_WIFI_MENU);

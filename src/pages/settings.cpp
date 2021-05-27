@@ -17,31 +17,29 @@ Settings::Settings(Minitel* m) :
 }
 
 MenuItem::MenuOutput Settings::run(bool connected) {
-    while(true) {
-        switch (_state)
-        {
-        case STATE_NEW:
-            showPage();
-            _state = STATE_WAITING_FOR_INPUT;
-            break;
-        case STATE_WAITING_FOR_INPUT: {
-            Input i = getInput();
-            if (i == INPUT_ENVOI) {
-                // _state = STATE_CONNECTING;
-            }
-            else if (i == INPUT_SOMMAIRE) {
-                return MenuItem::MenuOutput::HOME;
-            }
-            else if (i == INPUT_SEARCH) {
-                getCoordinatesFromSearch();
-                _state = STATE_NEW;
-            }
-            break;
+    switch (_state) {
+    case STATE_NEW:
+        showPage();
+        _state = STATE_WAITING_FOR_INPUT;
+        break;
+    case STATE_WAITING_FOR_INPUT: {
+        Input i = getInput();
+        if (i == INPUT_ENVOI) {
+            // _state = STATE_CONNECTING;
         }
-        default:
-            break;
+        else if (i == INPUT_SOMMAIRE) {
+            return MenuItem::MenuOutput::HOME;
         }
+        else if (i == INPUT_SEARCH) {
+            getCoordinatesFromSearch();
+            _state = STATE_NEW;
+        }
+        break;
     }
+    default:
+        break;
+    }
+    return MenuItem::MenuOutput::NONE;
 }
 
 void Settings::showMessage(const char* msg, const uint8_t offset = 0, bool shouldWait = true) {

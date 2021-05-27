@@ -4,40 +4,41 @@
 
 Weather::Weather(Minitel* m) :
     Page {m} {
-    _state = STATE_NEW;
+    _state = STATE_INIT;
     _weatherPage = 0;
 }
 
 MenuItem::MenuOutput Weather::run(bool connected) {
-    showConnectingPage();
-    if (!_weather.init()) {
-        _minitel->println("Impossible de se connecter au serveur météo.");
-        delay(2000);
-        return MenuItem::MenuOutput::HOME;
-    }
-    _maxPage = _weather.maxPage();
-
-    while(true) {
-        switch (_state) {
-            case STATE_NEW:
-                showPage();
-                _state = STATE_WAITING_FOR_INPUT;
-                break;
-            case STATE_WAITING_FOR_INPUT: {
-                Input i = getInput();
-                if (i == GO_TO_NEW_PAGE) {
-                    _state = STATE_NEW;
-                }
-                else if (i == GO_TO_SOMMAIRE) {
-                    return MenuItem::MenuOutput::HOME;
-                }
-                else if (i == GO_TO_SETTINGS) {
-                    return MenuItem::MenuOutput::SETTINGS;
-                }
-                break;
+    switch (_state) {
+        case STATE_INIT:
+            showConnectingPage();
+            if (!_weather.init()) {
+                _minitel->println("Impossible de se connecter au serveur météo.");
+                delay(2000);
+                return MenuItem::MenuOutput::HOME;
             }
+            _maxPage = _weather.maxPage();
+            _state = STATE_NEW;
+            break;
+        case STATE_NEW:
+            showPage();
+            _state = STATE_WAITING_FOR_INPUT;
+            break;
+        case STATE_WAITING_FOR_INPUT: {
+            Input i = getInput();
+            if (i == GO_TO_NEW_PAGE) {
+                _state = STATE_NEW;
+            }
+            else if (i == GO_TO_SOMMAIRE) {
+                return MenuItem::MenuOutput::HOME;
+            }
+            else if (i == GO_TO_SETTINGS) {
+                return MenuItem::MenuOutput::SETTINGS;
+            }
+            break;
         }
     }
+    return MenuItem::MenuOutput::NONE;
 }
 
 void Weather::showConnectingPage() {

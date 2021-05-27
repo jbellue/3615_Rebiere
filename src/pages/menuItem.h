@@ -9,6 +9,7 @@ class MenuItem {
     String _unconnectedName;
 
     enum MenuOutput {
+        NONE = -1,
         HOME = 0,
         WIFI_MENU,
         WEATHER,

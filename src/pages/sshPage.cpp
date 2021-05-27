@@ -1,66 +1,62 @@
 #include "pages/sshPage.h"
-#include "sshClient.h"
 
 MenuItem::MenuOutput SSHPage::run() {
-    SSHClient *sshClient = NULL;
-    while(true) {
-        switch(_state) {
-            case STATE_NEW:
-                showPage();
-                _state = STATE_WAITING_FOR_INPUT;
-                break;
-            case STATE_WAITING_FOR_INPUT: {
-                Input i = getInput();
-                if (i == INPUT_ENVOI) {
-                    _state = STATE_CONNECTING;
-                }
-                else if (i == INPUT_SOMMAIRE) {
-                    _state = STATE_DONE;
-                }
-                break;
+    switch(_state) {
+        case STATE_NEW:
+            showPage();
+            _state = STATE_WAITING_FOR_INPUT;
+            break;
+        case STATE_WAITING_FOR_INPUT: {
+            Input i = getInput();
+            if (i == INPUT_ENVOI) {
+                _state = STATE_CONNECTING;
             }
-            case STATE_CONNECTING: {
-                sshClient = new SSHClient();
-                SSHClient::SSHStatus status = sshClient->init(    
-                        _inputs[FIELD_HOST].c_str(),
-                        _inputs[FIELD_USERNAME].c_str(),
-                        _inputs[FIELD_PASSWORD].c_str()
-                );
-                if (status == SSHClient::SSHStatus::OK) {
-                    _minitel->modeTeleinformatique();
-                    _minitel->echo(false);
-                    _state = STATE_CONNECTED;
+            else if (i == INPUT_SOMMAIRE) {
+                _state = STATE_DONE;
+            }
+            break;
+        }
+        case STATE_CONNECTING: {
+            _sshClient = new SSHClient();
+            SSHClient::SSHStatus status = _sshClient->init(
+                    _inputs[FIELD_HOST].c_str(),
+                    _inputs[FIELD_USERNAME].c_str(),
+                    _inputs[FIELD_PASSWORD].c_str()
+            );
+            if (status == SSHClient::SSHStatus::OK) {
+                _minitel->modeTeleinformatique();
+                _minitel->echo(false);
+                _state = STATE_CONNECTED;
+            }
+            else {
+                _minitel->moveCursorDown(1);
+                if (status == SSHClient::SSHStatus::AUTHENTICATION_ERROR) {
+                    _minitel->println("ERREUR D'AUTHENTIFICATION");
                 }
                 else {
-                    _minitel->moveCursorDown(1);
-                    if (status == SSHClient::SSHStatus::AUTHENTICATION_ERROR) {
-                        _minitel->println("ERREUR D'AUTHENTIFICATION");
-                    }
-                    else {
-                        _minitel->println("ERREUR DE CONNEXION");
-                    }
-                    delay(2000);
-                    _state = STATE_NEW;
+                    _minitel->println("ERREUR DE CONNEXION");
                 }
-                break;
+                delay(2000);
+                _state = STATE_NEW;
             }
-            case STATE_CONNECTED:
-                if(!sshClient->poll(_minitel)) {
-                    _state = STATE_DONE;
-                }
-                break;
-            case STATE_DONE:
-                if(sshClient) {
-                    sshClient->cleanup();
-                    delete sshClient;
-                }
-                _minitel->modeVideotex();
-                _minitel->echo(true);
-                _minitel->smallMode();
-                return MenuItem::MenuOutput::HOME;
-                break;
+            break;
         }
+        case STATE_CONNECTED:
+            if(!_sshClient->poll(_minitel)) {
+                _state = STATE_DONE;
+            }
+            break;
+        case STATE_DONE:
+            if(_sshClient) {
+                _sshClient->cleanup();
+                delete _sshClient;
+            }
+            _minitel->modeVideotex();
+            _minitel->echo(true);
+            _minitel->smallMode();
+            return MenuItem::MenuOutput::HOME;
     }
+    return MenuItem::MenuOutput::NONE;
 }
 
 void SSHPage::showPage() {

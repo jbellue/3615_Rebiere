@@ -3,12 +3,14 @@
 
 #include <Arduino.h>
 #include "page.h"
+#include "sshClient.h"
 
 class SSHPage : public Page {
 public:
     SSHPage(Minitel* m) :
         Page {m},
-        _state(STATE_NEW) { }
+        _state(STATE_NEW),
+        _sshClient(NULL) { }
     MenuItem::MenuOutput run();
 
 private:
@@ -36,6 +38,7 @@ private:
     Field _field;
     State _state;
     String _inputs[3];
+    SSHClient* _sshClient;
 };
 
 #endif

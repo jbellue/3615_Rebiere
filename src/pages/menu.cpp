@@ -31,34 +31,33 @@ void Menu::initMenuItems() {
 }
 
 MenuItem::MenuOutput Menu::run(bool connected) {
-    while(true) {
-        if (connected != _connected) {
-            _connected = connected;
-            _state = STATE_NEW;
-        }
-        switch (_state) {
-            case STATE_NEW:
-                showPage();
-                _state = STATE_WAITING_FOR_INPUT;
-                break;
-            case STATE_WAITING_FOR_INPUT:
-                if (getInput()) {
-                    _state = STATE_CHECK_INPUT;
-                    _minitel->moveCursorReturn(1);
-                    _minitel->noCursor();
-                }
-                break;
-            case STATE_CHECK_INPUT:
-                const MenuItem::MenuOutput newPage = checkInput();
-                if (newPage == MenuItem::MenuOutput::HOME) {
-                    _state = STATE_NEW;
-                }
-                else {
-                    return newPage;
-                }
-                break;
-        }
+    if (connected != _connected) {
+        _connected = connected;
+        _state = STATE_NEW;
     }
+    switch (_state) {
+        case STATE_NEW:
+            showPage();
+            _state = STATE_WAITING_FOR_INPUT;
+            break;
+        case STATE_WAITING_FOR_INPUT:
+            if (getInput()) {
+                _state = STATE_CHECK_INPUT;
+                _minitel->moveCursorReturn(1);
+                _minitel->noCursor();
+            }
+            break;
+        case STATE_CHECK_INPUT:
+            const MenuItem::MenuOutput newPage = checkInput();
+            if (newPage == MenuItem::MenuOutput::HOME) {
+                _state = STATE_NEW;
+            }
+            else {
+                return newPage;
+            }
+            break;
+    }
+    return MenuItem::MenuOutput::NONE;
 }
 
 MenuItem::MenuOutput Menu::checkInput() {
