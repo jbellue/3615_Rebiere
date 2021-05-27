@@ -18,17 +18,17 @@ SSHClient::SSHStatus SSHClient::init(const char* host, const char* username, con
     return status;
 }
 
-bool SSHClient::poll(Display display) {
+bool SSHClient::poll(Minitel* minitel) {
     if (!ssh_channel_is_open(_channel) || ssh_channel_is_eof(_channel)) {
         return false;
     }
 
     const int nbytes = ssh_channel_read_nonblocking(_channel, _readBuffer, sizeof(_readBuffer), 0);
     if (nbytes > 0) {
-        display.print(_readBuffer);
+        minitel->printRaw(_readBuffer);
     }
     char writeBuffer[4] = { 0 };
-    const size_t len = display.getInput(writeBuffer);
+    const size_t len = getMinitelInput(minitel->getKeyCode(), writeBuffer);
     if (len == 0) {
         usleep(50000L);
     }
@@ -135,4 +135,39 @@ void SSHClient::close_session() {
         ssh_disconnect(_session);
         ssh_free(_session);
     }
+}
+
+size_t SSHClient::getMinitelInput(unsigned long key, char* buffer) {
+    if (!key) {
+        return 0;
+    }
+    if (!(key >> 8)) {
+        buffer[0] = (char)(key & 0xFF);
+        return 1;
+    }
+    if (!(key >> 16)) {
+        buffer[0] = (char)((key >> 8) & 0xFF);
+        buffer[1] = (char)(key & 0xFF);
+        return 2;
+    }
+    size_t len = 3;
+    switch(key) {
+        case 0x1B4F4D:  //ENVOI
+            buffer[0] = 0x0D;
+            len = 1;
+            break;
+        case 0x1B4F6C:  //CORRECTION
+            buffer[0] = 0x7F;
+            len = 1;
+            break;
+        case 0x1B4F51:  //ANNULATION
+            buffer[0] = 0x15;
+            len = 1;
+            break;
+        default:
+            buffer[0] = (char)((key >> 16) & 0xFF);
+            buffer[1] = (char)((key >> 8) & 0xFF);
+            buffer[2] = (char)(key & 0xFF);
+    }
+    return len;
 }

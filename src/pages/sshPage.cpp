@@ -1,8 +1,7 @@
 #include "pages/sshPage.h"
 #include "sshClient.h"
-#include "display.h"
 
-uint8_t SSHPage::run() {
+MenuItem::MenuOutput SSHPage::run() {
     SSHClient *sshClient = NULL;
     while(true) {
         switch(_state) {
@@ -28,16 +27,17 @@ uint8_t SSHPage::run() {
                         _inputs[FIELD_PASSWORD].c_str()
                 );
                 if (status == SSHClient::SSHStatus::OK) {
-                    _display->set80columns();
+                    _minitel->modeTeleinformatique();
+                    _minitel->echo(false);
                     _state = STATE_CONNECTED;
                 }
                 else {
-                    _display->minitel()->moveCursorDown(1);
+                    _minitel->moveCursorDown(1);
                     if (status == SSHClient::SSHStatus::AUTHENTICATION_ERROR) {
-                        _display->println("ERREUR D'AUTHENTIFICATION");
+                        _minitel->println("ERREUR D'AUTHENTIFICATION");
                     }
                     else {
-                        _display->println("ERREUR DE CONNEXION");
+                        _minitel->println("ERREUR DE CONNEXION");
                     }
                     delay(2000);
                     _state = STATE_NEW;
@@ -45,7 +45,7 @@ uint8_t SSHPage::run() {
                 break;
             }
             case STATE_CONNECTED:
-                if(!sshClient->poll(*_display)) {
+                if(!sshClient->poll(_minitel)) {
                     _state = STATE_DONE;
                 }
                 break;
@@ -54,44 +54,46 @@ uint8_t SSHPage::run() {
                     sshClient->cleanup();
                     delete sshClient;
                 }
-                _display->set40columns();
-                return 1;
+                _minitel->modeVideotex();
+                _minitel->echo(true);
+                _minitel->smallMode();
+                return MenuItem::MenuOutput::HOME;
                 break;
         }
     }
 }
 
 void SSHPage::showPage() {
-    _display->minitel()->noCursor();
-    _display->minitel()->newScreen();
-    _display->minitel()->attributs(DOUBLE_HAUTEUR);
-    _display->minitel()->println("MENU client SSH");
-    _display->minitel()->attributs(GRANDEUR_NORMALE);
+    _minitel->noCursor();
+    _minitel->newScreen();
+    _minitel->attributs(DOUBLE_HAUTEUR);
+    _minitel->println("MENU client SSH");
+    _minitel->attributs(GRANDEUR_NORMALE);
 
     // underline the title
     for (int i = 1; i <= 40; i++) {
-        _display->minitel()->writeByte(0x7E);
+        _minitel->writeByte(0x7E);
     }
 
-    _display->minitel()->moveCursorDown(1);
-    _display->minitel()->println("Hôte :");
-    _display->minitel()->print(".");
-    _display->minitel()->repeat(39);
-    _display->minitel()->moveCursorLeft(40);
-    _display->minitel()->println("Nom d'utilisateur :");
-    _display->minitel()->print(".");
-    _display->minitel()->repeat(39);
-    _display->minitel()->moveCursorLeft(40);
-    _display->minitel()->println("Mot de passe :");
-    _display->minitel()->print(".");
-    _display->minitel()->repeat(39);
-    _display->minitel()->moveCursorLeft(40);
-    _display->minitel()->cursor();
-    _display->minitel()->moveCursorXY(0, 7);
+    _minitel->moveCursorDown(1);
+    _minitel->println("Hôte :");
+    _minitel->print(".");
+    _minitel->repeat(39);
+    _minitel->moveCursorLeft(40);
+    _minitel->println("Nom d'utilisateur :");
+    _minitel->print(".");
+    _minitel->repeat(39);
+    _minitel->moveCursorLeft(40);
+    _minitel->println("Mot de passe :");
+    _minitel->print(".");
+    _minitel->repeat(39);
+    _minitel->moveCursorLeft(40);
+    _minitel->cursor();
+    _minitel->moveCursorXY(0, 7);
 }
 
 SSHPage::Input SSHPage::getInput() {
-    unsigned long key = _display->minitel()->getKeyCode();
+    unsigned long key = _minitel->getKeyCode();
     _field = FIELD_HOST;
     uint8_t x, y = 0;
     while(key != ENVOI && key != SOMMAIRE) {
@@ -112,7 +114,7 @@ SSHPage::Input SSHPage::getInput() {
                         break;
                 }
                 x = _inputs[_field].length() + 1;
-                _display->minitel()->moveCursorXY(x, y);
+                _minitel->moveCursorXY(x, y);
                 break;
             case SUITE:
                 switch (_field) {
@@ -130,23 +132,23 @@ SSHPage::Input SSHPage::getInput() {
                         break;
                 }
                 x = _inputs[_field].length() + 1;
-                _display->minitel()->moveCursorXY(x, y);
+                _minitel->moveCursorXY(x, y);
                 break;
             case CORRECTION:
                 if (_inputs[_field].length() > 0) {
                     _inputs[_field].remove(_inputs[_field].length() - 1, 1);
                 }
-                _display->minitel()->moveCursorLeft(1);
-                _display->minitel()->print(".");
-                _display->minitel()->moveCursorLeft(1);
+                _minitel->moveCursorLeft(1);
+                _minitel->print(".");
+                _minitel->moveCursorLeft(1);
                 break;
             case ANNULATION:
                 _inputs[_field] = "";
-                _display->minitel()->moveCursorLeft(40);
-                _display->minitel()->print(".");
-                _display->minitel()->repeat(39);
-                _display->minitel()->moveCursorLeft(40);
-                _display->minitel()->moveCursorUp(1);
+                _minitel->moveCursorLeft(40);
+                _minitel->print(".");
+                _minitel->repeat(39);
+                _minitel->moveCursorLeft(40);
+                _minitel->moveCursorUp(1);
                 break;
             case 0:
             case REPETITION:
@@ -157,12 +159,12 @@ SSHPage::Input SSHPage::getInput() {
                 break;
             default:
                 if (_field == FIELD_PASSWORD) {
-                    _display->minitel()->moveCursorLeft(1);
-                    _display->minitel()->print("*");
+                    _minitel->moveCursorLeft(1);
+                    _minitel->print("*");
                 }
                 _inputs[_field] += char(key);
         }
-        key = _display->minitel()->getKeyCode();
+        key = _minitel->getKeyCode();
     }
 
     switch (key) {

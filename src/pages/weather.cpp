@@ -2,18 +2,18 @@
 #include "asciiImages.h"
 #include "utils.h"
 
-Weather::Weather(Minitel* m) {
-    _minitel = m;
+Weather::Weather(Minitel* m) :
+    Page {m} {
     _state = STATE_NEW;
     _weatherPage = 0;
 }
 
-uint8_t Weather::run() {
+MenuItem::MenuOutput Weather::run(bool connected) {
     showConnectingPage();
     if (!_weather.init()) {
         _minitel->println("Impossible de se connecter au serveur météo.");
         delay(2000);
-        return 0;
+        return MenuItem::MenuOutput::HOME;
     }
     _maxPage = _weather.maxPage();
 
@@ -23,16 +23,16 @@ uint8_t Weather::run() {
                 showPage();
                 _state = STATE_WAITING_FOR_INPUT;
                 break;
-            case STATE_WAITING_FOR_INPUT: {   
+            case STATE_WAITING_FOR_INPUT: {
                 Input i = getInput();
                 if (i == GO_TO_NEW_PAGE) {
                     _state = STATE_NEW;
                 }
                 else if (i == GO_TO_SOMMAIRE) {
-                    return 0;
+                    return MenuItem::MenuOutput::HOME;
                 }
                 else if (i == GO_TO_SETTINGS) {
-                    return 1;
+                    return MenuItem::MenuOutput::SETTINGS;
                 }
                 break;
             }

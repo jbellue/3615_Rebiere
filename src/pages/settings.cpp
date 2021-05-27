@@ -6,8 +6,8 @@
 
 extern Preferences preferences;
 
-Settings::Settings(Minitel* m) {
-    _minitel = m;
+Settings::Settings(Minitel* m) :
+    Page {m} {
     _state = STATE_NEW;
     _inputs[0] = String(preferences.getFloat("locationLat", 0.00));
     _errors[0] = false;
@@ -15,7 +15,8 @@ Settings::Settings(Minitel* m) {
     _errors[1] = false;
     _field = FIELD_TOWN;
 }
-uint8_t Settings::run() {
+
+MenuItem::MenuOutput Settings::run(bool connected) {
     while(true) {
         switch (_state)
         {
@@ -29,7 +30,7 @@ uint8_t Settings::run() {
                 // _state = STATE_CONNECTING;
             }
             else if (i == INPUT_SOMMAIRE) {
-                return 0;
+                return MenuItem::MenuOutput::HOME;
             }
             else if (i == INPUT_SEARCH) {
                 getCoordinatesFromSearch();

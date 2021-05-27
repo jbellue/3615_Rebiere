@@ -1,7 +1,7 @@
 #include "WiFiMenu.h"
 #include <string>
 
-uint8_t WiFiMenu::run() {
+MenuItem::MenuOutput WiFiMenu::run(bool connected) {
     while(true) {
         switch (_state) {
             case STATE_NEW:
@@ -47,7 +47,7 @@ uint8_t WiFiMenu::run() {
                 passwordForm();
                 break;
             case STATE_DONE:
-                return 1;
+                return MenuItem::MenuOutput::HOME;
         }
     }
 }

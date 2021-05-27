@@ -2,12 +2,13 @@
 #define _PAGE_SETTINGS_H
 
 #include <Arduino.h>
-#include <Minitel1B_Hard.h>
+#include "page.h"
 
-class Settings {
+class Settings : public Page {
 public:
     Settings(Minitel* m);
-    uint8_t run();
+    MenuItem::MenuOutput run(bool connected);
+    virtual ~Settings() = default;
 
 private:
     void showTitle();
@@ -41,7 +42,6 @@ private:
         STATE_WAITING_FOR_INPUT
     };
 
-    Minitel* _minitel;
     State _state;
 };
 
