@@ -10,16 +10,20 @@ Weather::Weather(Minitel* m) :
 
 MenuItem::MenuOutput Weather::run(bool connected) {
     switch (_state) {
-        case STATE_INIT:
+        case STATE_INIT: {
             showConnectingPage();
-            if (!_weather.init()) {
-                _minitel->println("Impossible de se connecter au serveur météo.");
+            Error e = _weather.init();
+            if (e) {
+                _minitel->println("Erreur de connexion au serveur météo :");
+                _minitel->println(e.toString());
+                _minitel->println(e.msg);
                 delay(2000);
                 return MenuItem::MenuOutput::HOME;
             }
             _maxPage = _weather.maxPage();
             _state = STATE_NEW;
             break;
+        }
         case STATE_NEW:
             showPage();
             _state = STATE_WAITING_FOR_INPUT;

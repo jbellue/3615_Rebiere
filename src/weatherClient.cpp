@@ -3,16 +3,23 @@
 
 extern Preferences preferences;
 
+WeatherClient::WeatherClient() {
+    for(uint8_t i = 0; i < _forecastCount; ++i) {
+        _data[i].description = NULL;
+    }
+}
+
 WeatherClient::~WeatherClient() {
     for(uint8_t i = 0; i < _forecastCount; ++i) {
         if (_data[i].description) {
             free(_data[i].description);
+            _data[i].description = NULL;
         }
     }
 }
 
-bool WeatherClient::init() {
-    bool ret = false;
+Error WeatherClient::init() {
+    Error ret;
     HTTPClient http;
     http.useHTTP10(true);
     char urlBuffer[256];
@@ -24,6 +31,9 @@ bool WeatherClient::init() {
     const int httpResponseStatus = http.GET();
     if (httpResponseStatus > 0) {
         DynamicJsonDocument filter(1872);
+
+        filter["cod"] = true;
+        filter["message"] = true;
 
         JsonObject filter_current = filter.createNestedObject("current");
         filter_current["dt"] = true;
@@ -59,27 +69,24 @@ bool WeatherClient::init() {
         DeserializationError error = deserializeJson(doc, http.getStream(), DeserializationOption::Filter(filter));
 
         if (error) {
-            // _minitel->print(F("deserializeJson() failed: "));
-            // _minitel->println(error.f_str());
-            ret = false;
+            ret.id = Error::ErrorCode::DESERIALISE_JSON_FAILED;
+            ret.msg = strdup(error.c_str());
         }
         else {
             JsonVariant errorCode = doc["cod"];
             if (!errorCode.isNull()) {
-                // check the error message : 
-                // const char* message = doc["message"];
-                ret = false;
+                ret.id = Error::ErrorCode::API_ERROR;
+                ret.msg = strdup(doc["message"]);
             }
             else {
                 storeWeatherData(doc);
-                ret = true;
+                ret.id = Error::ErrorCode::NONE;
             }
         }
     }
     else {
-        // _minitel->print("Erreur de connexion : ");
-        // _minitel->println(httpResponseStatus);
-        ret = false;
+        ret.id = Error::ErrorCode::CONNECTION_FAILED;
+        ret.msg = strdup(http.errorToString(httpResponseStatus).c_str());
     }
     http.end();
     return ret;

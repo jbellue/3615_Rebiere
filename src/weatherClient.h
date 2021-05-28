@@ -3,12 +3,13 @@
 
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include "utils.h"
 
 class WeatherClient {
 public:
-    WeatherClient() {};
+    WeatherClient();
     ~WeatherClient();
-    bool init();
+    Error init();
 
     struct weatherData {
         long timestamp;
