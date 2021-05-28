@@ -89,7 +89,7 @@ void WeatherClient::storeWeatherData(DynamicJsonDocument doc) {
     // use the current data for today's weather
     _data[0].weatherID = doc["current"]["weather"][0]["id"];
     _data[0].timestamp = doc["current"]["dt"];
-    _data[0].description = strdup(doc["current"]["weather"][0]["description"].as<char*>());
+    _data[0].description = strdup(doc["current"]["weather"][0]["description"].as<const char*>());
     _data[0].temperature = doc["current"]["temp"];
     _data[0].feelsLikeTemperature = doc["current"]["feels_like"];
     _data[0].humidity = doc["current"]["humidity"];
@@ -104,7 +104,7 @@ void WeatherClient::storeWeatherData(DynamicJsonDocument doc) {
     for (uint8_t i = 1; i < _forecastCount; ++i) {
         _data[i].weatherID = doc["daily"][i]["weather"][0]["id"];
         _data[i].timestamp = doc["daily"][i]["dt"];
-        _data[i].description = strdup(doc["daily"][i]["weather"][0]["description"].as<char*>());
+        _data[i].description = strdup(doc["daily"][i]["weather"][0]["description"].as<const char*>());
         _data[i].temperature = doc["daily"][i]["temp"]["day"];
         _data[i].feelsLikeTemperature = doc["daily"][i]["feels_like"]["day"];
         _data[i].humidity = doc["daily"][i]["humidity"];
