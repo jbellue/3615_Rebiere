@@ -2,7 +2,7 @@
 #define _PAGE_WIFI_MENU_H
 
 #include <Arduino.h>
-#include <Minitel1B_Hard.h>
+#include "page.h"
 #include "esp_wifi_types.h"
 #include "esp_wifi.h"
 #include <WiFi.h>
@@ -10,13 +10,14 @@
 
 static uint8_t _connectionRetryCount;
 
-class WiFiMenu {
+class WiFiMenu : public Page {
 public:
     WiFiMenu(Minitel* m) :
-        _minitel(m),
+        Page {m},
         _state(STATE_NEW),
         _input('\0') { _connectionRetryCount = 0; }
-    uint8_t run();
+
+    MenuItem::MenuOutput run(bool connected);
 
 private:
     void showPage();
@@ -33,14 +34,13 @@ private:
         STATE_DONE
     };
 
-    enum Page {
+    enum SubPage {
         PAGE_DISCONNECT,
         PAGE_SELECT_NETWORK
     };
 
-    Minitel* _minitel;
     State _state;
-    Page _page;
+    SubPage _page;
     String _ssid;
     String _password;
     wifi_auth_mode_t _authMode;

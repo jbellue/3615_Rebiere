@@ -1,31 +1,10 @@
 #ifndef _PAGE_MENU_H
 #define _PAGE_MENU_H
 
-#include <Arduino.h>
-#include <Minitel1B_Hard.h>
+#include "page.h"
+#include "menuItem.h"
 
-class MenuItem {
-    public:
-    String _name;
-    String _unconnectedName;
-
-    enum MenuOutput {
-        NONE = 0,
-        WIFI_MENU,
-        WEATHER,
-        SSH,
-        SETTINGS
-    };
-
-    void needsConnection(bool b) {_needsConnected = b;}
-    bool needsConnection() { return _needsConnected; }
-    MenuOutput id;
-
-    private:
-    bool _needsConnected;
-};
-
-class Menu {
+class Menu : public Page {
     public:
     Menu(Minitel* m, bool connected);
     MenuItem::MenuOutput run(bool connected);
@@ -41,7 +20,6 @@ class Menu {
         STATE_CHECK_INPUT
     };
 
-    Minitel* _minitel;
     State _state;
     MenuItem* _items;
     size_t _itemsCount;

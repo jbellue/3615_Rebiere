@@ -3,7 +3,7 @@
 
 #include <libssh/libssh.h>
 #include <libssh_esp32.h>
-#include "display.h"
+#include <Minitel1B_Hard.h>
 
 class SSHClient {
     public:
@@ -17,7 +17,7 @@ class SSHClient {
 
     SSHStatus init(const char *host, const char *user, const char *password);
     SSHStatus connect_ssh(const char *host, const char *user, const char *password, const int verbosity);
-    bool poll(Display display);
+    bool poll(Minitel* minitel);
     SSHStatus start_session(const char *host, const char *user, const char *password);
     void close_session();
     int interactive_shell_session();
@@ -29,6 +29,7 @@ class SSHClient {
     ssh_session _session;
     ssh_channel _channel;
     char _readBuffer[256] = {'\0'};
+    size_t getMinitelInput(unsigned long key, char* buffer);
 };
 
 #endif

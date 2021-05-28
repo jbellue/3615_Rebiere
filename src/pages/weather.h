@@ -2,13 +2,13 @@
 #define _PAGE_WEATHER_H
 
 #include <Arduino.h>
-#include <Minitel1B_Hard.h>
+#include "page.h"
 #include <weatherClient.h>
 
-class Weather {
+class Weather : public Page {
 public:
     Weather(Minitel* m);
-    uint8_t run();
+    MenuItem::MenuOutput run(bool connected);
 
 private:
     void showConnectingPage();
@@ -35,11 +35,11 @@ private:
     void displayBottomMenu();
 
     enum State {
+        STATE_INIT,
         STATE_NEW,
         STATE_WAITING_FOR_INPUT
     };
 
-    Minitel* _minitel;
     State _state;
 };
 

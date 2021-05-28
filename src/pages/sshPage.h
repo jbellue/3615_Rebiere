@@ -2,14 +2,16 @@
 #define _PAGE_SSH_H
 
 #include <Arduino.h>
-#include "display.h"
+#include "page.h"
+#include "sshClient.h"
 
-class SSHPage {
+class SSHPage : public Page {
 public:
-    SSHPage(Display* d) :
-        _display(d),
-        _state(STATE_NEW) { }
-    uint8_t run();
+    SSHPage(Minitel* m) :
+        Page {m},
+        _state(STATE_NEW),
+        _sshClient(NULL) { }
+    MenuItem::MenuOutput run(bool connected);
 
 private:
     enum Input {
@@ -34,9 +36,9 @@ private:
     };
 
     Field _field;
-    Display* _display;
     State _state;
     String _inputs[3];
+    SSHClient* _sshClient;
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "menu.h"
 
-Menu::Menu(Minitel* m, bool connected) {
-    _minitel = m;
+Menu::Menu(Minitel* m, bool connected) :
+        Page {m, connected} {
     _state = STATE_NEW;
     _input = '\0';
     _connected = connected;
@@ -49,7 +49,7 @@ MenuItem::MenuOutput Menu::run(bool connected) {
             break;
         case STATE_CHECK_INPUT:
             const MenuItem::MenuOutput newPage = checkInput();
-            if (newPage == MenuItem::NONE) {
+            if (newPage == MenuItem::MenuOutput::HOME) {
                 _state = STATE_NEW;
             }
             else {
@@ -57,7 +57,7 @@ MenuItem::MenuOutput Menu::run(bool connected) {
             }
             break;
     }
-    return MenuItem::NONE;
+    return MenuItem::MenuOutput::NONE;
 }
 
 MenuItem::MenuOutput Menu::checkInput() {
@@ -67,7 +67,7 @@ MenuItem::MenuOutput Menu::checkInput() {
             return _items[i].id;
         }
     }
-    return MenuItem::NONE;
+    return MenuItem::HOME;
 }
 
 void Menu::showPage() {
