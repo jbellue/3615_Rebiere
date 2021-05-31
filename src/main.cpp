@@ -15,7 +15,7 @@ const unsigned int configSTACK = 51200;
 
 static volatile state_t state;
 
-void newState(state_t s) {
+void newState(const state_t s) {
     state = s;
 }
 
@@ -25,60 +25,23 @@ void controlTask(void *pvParameter) {
 
     vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
 
-    Page* page = NULL;
+    std::unique_ptr<Page> page = nullptr;
     while(1) {
         switch(state) {
-            case STATE_NEW:
-                vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
-                newState(STATE_HOME_MENU);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
+            case STATE_HOME_MENU:
+                page = std::unique_ptr<Page>(new Menu(&minitel, WiFi.status() == WL_CONNECTED));
                 break;
-            case STATE_HOME_MENU: {
-                Menu* m = new Menu(&minitel, WiFi.status() == WL_CONNECTED);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
-                page = m;
-                break;
-            }
             case STATE_WIFI_MENU: {
-                WiFiMenu* m = new WiFiMenu(&minitel);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
-                page = m;
+                page = std::unique_ptr<Page>(new WiFiMenu(&minitel));
                 break;
-            }
-            case STATE_SSH: {
-                SSHPage* s = new SSHPage(&minitel);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
-                page = s;
+            case STATE_SSH:
+                page = std::unique_ptr<Page>(new SSHPage(&minitel));
                 break;
-            }
-            case STATE_WEATHER: {
-                Weather* w = new Weather(&minitel);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
-                page = w;
+            case STATE_WEATHER:
+                page = std::unique_ptr<Page>(new Weather(&minitel));
                 break;
-            }
-            case STATE_SETTINGS: {
-                WeatherSettings* w = new WeatherSettings(&minitel);
-                if (page) {
-                    delete page;
-                    page = NULL;
-                }
-                page = w;
+            case STATE_SETTINGS:
+                page = std::unique_ptr<Page>(new WeatherSettings(&minitel));
                 break;
             }
             default:
@@ -116,7 +79,7 @@ void controlTask(void *pvParameter) {
 }
 
 void setup() {
-    state = STATE_NEW;
+    state = STATE_HOME_MENU;
     preferences.begin("3615");
 
     // Initialize the preferences only once:
