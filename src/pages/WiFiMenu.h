@@ -36,7 +36,8 @@ private:
 
     enum SubPage {
         PAGE_DISCONNECT,
-        PAGE_SELECT_NETWORK
+        PAGE_SELECT_NETWORK,
+        PAGE_NO_NETWORK_FOUND
     };
 
     State _state;

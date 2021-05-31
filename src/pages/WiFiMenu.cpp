@@ -25,19 +25,20 @@ MenuItem::MenuOutput WiFiMenu::run(bool connected) {
                 _state = STATE_NEW;
             }
             else {
-                switch(_page) {
-                    case PAGE_SELECT_NETWORK:
-                        _ssid = WiFi.SSID(action - 1);
-                        _authMode = WiFi.encryptionType(action - 1);
-                        _channel = WiFi.channel(action - 1);
-                        _state = STATE_ENTER_PASSWORD;
-                        break;
-                    case PAGE_DISCONNECT:
-                        WiFi.disconnect();
-                        _minitel->println("Déconnexion...");
-                        while(WiFi.status() != WL_DISCONNECTED);
-                        _state = STATE_NEW;
-                        break;
+                if(_page == PAGE_SELECT_NETWORK) {
+                    _ssid = WiFi.SSID(action - 1);
+                    _authMode = WiFi.encryptionType(action - 1);
+                    _channel = WiFi.channel(action - 1);
+                    _state = STATE_ENTER_PASSWORD;
+                }
+                if(_page == PAGE_NO_NETWORK_FOUND) {
+                    _state = STATE_NEW;
+                }
+                else { // PAGE_DISCONNECT
+                    WiFi.disconnect();
+                    _minitel->println("Déconnexion...");
+                    while(WiFi.status() != WL_DISCONNECTED);
+                    _state = STATE_NEW;
                 }
             }
             break;
@@ -54,7 +55,7 @@ MenuItem::MenuOutput WiFiMenu::run(bool connected) {
 static uint8_t connectionStatus;
 
 void WiFiMenu::passwordForm() {
-    connectionStatus = 255;
+    connectionStatus = SYSTEM_EVENT_MAX; // fake unattainable event
     _minitel->moveCursorDown(1);
     _minitel->println("Mot de passe :");
     _minitel->print(".");
@@ -108,9 +109,9 @@ void WiFiMenu::passwordForm() {
     _minitel->println("Connexion...");
     connectToAP();
 
-    while(connectionStatus == 255); // wait until we get a connection or rejection
+    while(connectionStatus == SYSTEM_EVENT_MAX); // wait until we get a connection or rejection
     _minitel->moveCursorDown(1);
-    if (connectionStatus == 0) {
+    if (connectionStatus == SYSTEM_EVENT_STA_GOT_IP) {
         _minitel->println("Connecté !");
         _state = STATE_DONE;
         delay(1000);
@@ -126,10 +127,10 @@ void WiFiMenu::passwordForm() {
 
 void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info) {
     if(event == SYSTEM_EVENT_STA_DISCONNECTED) {
-        connectionStatus = 2;
+        connectionStatus = SYSTEM_EVENT_STA_DISCONNECTED;
     }
     else if (event == SYSTEM_EVENT_STA_GOT_IP) {
-        connectionStatus = 0;
+        connectionStatus = SYSTEM_EVENT_STA_GOT_IP;
     }
 }
 
@@ -178,7 +179,9 @@ void WiFiMenu::showPage() {
         _minitel->moveCursorUp(1);
         if (n == 0) {
             _minitel->println("Aucun réseau trouvé");
-        } else {
+            _page = PAGE_NO_NETWORK_FOUND;
+        }
+        else {
             char buffer[255] = { '\0' };
             if (n == 1) {
                 sprintf(buffer, "1 réseau trouvé :");
@@ -192,8 +195,8 @@ void WiFiMenu::showPage() {
                 sprintf(buffer, "%i : %s", i+1, WiFi.SSID(i).c_str());
                 _minitel->println(buffer);
             }
+            _page = PAGE_SELECT_NETWORK;
         }
-        _page = PAGE_SELECT_NETWORK;
     }
     _minitel->moveCursorDown(1);
     _minitel->cursor();
