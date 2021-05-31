@@ -85,18 +85,7 @@ void Menu::showPage() {
     _minitel->moveCursorReturn(2);
 
     for(uint8_t i = 0; i < _itemsCount; ++i) {
-        _minitel->attributs(INVERSION_FOND);
-        if(!_connected && _items[i].needsConnection()) {
-            _minitel->attributs(CARACTERE_BLEU);
-            _minitel->print("X");
-        }
-        else {
-            _minitel->print(String(_items[i].id));
-        }
-        _minitel->attributs(FOND_NORMAL);
-        _minitel->print(" - ");
-        _minitel->println(_items[i]._name);
-        _minitel->attributs(CARACTERE_BLANC);
+        _items[i].display(_minitel, _connected);
     }
 
     _minitel->moveCursorReturn(2);

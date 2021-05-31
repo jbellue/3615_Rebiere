@@ -2,6 +2,7 @@
 #define _PAGE_MENUITEM_H
 
 #include <Arduino.h>
+#include <Minitel1B_Hard.h>
 
 class MenuItem {
     public:
@@ -18,7 +19,8 @@ class MenuItem {
     };
 
     void needsConnection(bool b) {_needsConnected = b;}
-    bool needsConnection() { return _needsConnected; }
+    bool needsConnection() const { return _needsConnected; }
+    void display(Minitel* m, const bool connected);
     MenuOutput id;
 
     private:

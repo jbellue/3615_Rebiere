@@ -11,6 +11,7 @@ class Menu : public Page {
 
     private:
     void showPage();
+    void displayMenuItem(const MenuItem* m);
     uint8_t getInput();
     MenuItem::MenuOutput checkInput();
 
