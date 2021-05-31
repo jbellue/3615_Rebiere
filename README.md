@@ -60,3 +60,4 @@ On first run, you can set the default parameters by uncommenting the block
 
 - Add a smart home page (probably an MQTT client?)
 - Add a settings page (for now, to set the API keys)
+- Figure out a way to properly set the minitel speed
