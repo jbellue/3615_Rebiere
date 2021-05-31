@@ -1,10 +1,10 @@
 #include "menu.h"
 
-Menu::Menu(Minitel* m, bool connected) :
-        Page {m, connected} {
+Menu::Menu(Minitel* m) :
+        Page {m} {
     _state = STATE_NEW;
     _input = '\0';
-    _connected = connected;
+    _connected = false;
 
     initMenuItems();
 }

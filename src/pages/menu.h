@@ -6,7 +6,7 @@
 
 class Menu : public Page {
     public:
-    Menu(Minitel* m, bool connected);
+    Menu(Minitel* m);
     MenuItem::MenuOutput run(bool connected);
 
     private:

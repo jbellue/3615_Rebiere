@@ -30,7 +30,7 @@ void controlTask(void *pvParameter) {
     while(1) {
         switch(state) {
             case STATE_HOME_MENU:
-                page = std::unique_ptr<Page>(new Menu(&minitel, WiFi.status() == WL_CONNECTED));
+                page = std::unique_ptr<Page>(new Menu(&minitel));
                 break;
             case STATE_WIFI_MENU: {
                 page = std::unique_ptr<Page>(new WiFiMenu(&minitel));
@@ -90,6 +90,7 @@ void setup() {
 
     xTaskCreatePinnedToCore(controlTask, "control", configSTACK, NULL, (tskIDLE_PRIORITY + 3), NULL, portNUM_PROCESSORS - 1);
     WiFi.begin();
+    WiFi.scanNetworks(true);
 }
 
 void loop() {

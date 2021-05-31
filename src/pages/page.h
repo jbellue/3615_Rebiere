@@ -10,8 +10,6 @@ protected:
 public:
     Page(Minitel* m) :
         _minitel(m) {};
-    Page(Minitel* m, bool connected) :
-        _minitel(m) {};
     virtual ~Page() = default;
 
     virtual MenuItem::MenuOutput run(bool connected) { return MenuItem::MenuOutput::HOME; }
