@@ -13,11 +13,4 @@ typedef enum {
     STATE_SETTINGS
 } state_t;
 
-int show_remote_processes(ssh_session session);
-void close_session(ssh_session session);
-void close_channel(ssh_channel channel);
-ssh_session start_session();
-ssh_channel open_channel(ssh_session session);
-int interactive_shell_session(ssh_channel channel);
-
 #endif
