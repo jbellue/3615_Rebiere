@@ -21,14 +21,19 @@ void newState(const state_t s) {
 
 void controlTask(void *pvParameter) {
     Minitel minitel = Minitel(Serial);
-    minitel.changeSpeed(4800);
-    minitel.smallMode();
 
     vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
 
     std::unique_ptr<Page> page = nullptr;
     while(1) {
         switch(state) {
+            case STATE_NEW:
+                minitel.changeSpeed(4800);
+                minitel.smallMode();
+                vTaskDelay(NET_WAIT_MS / portTICK_PERIOD_MS);
+
+                newState(STATE_HOME_MENU);
+                break;
             case STATE_HOME_MENU:
                 page = std::unique_ptr<Page>(new Menu(&minitel));
                 break;
@@ -80,7 +85,7 @@ void controlTask(void *pvParameter) {
 }
 
 void setup() {
-    state = STATE_HOME_MENU;
+    state = STATE_NEW;
     preferences.begin("3615");
 
     // Initialize the preferences only once:

@@ -5,6 +5,7 @@
 #include <libssh/threads.h>
 
 typedef enum {
+    STATE_NEW,
     STATE_HOME_MENU,
     STATE_WIFI_MENU,
     STATE_SSH,
