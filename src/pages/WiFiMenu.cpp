@@ -31,7 +31,7 @@ MenuItem::MenuOutput WiFiMenu::run(bool connected) {
                     _channel = WiFi.channel(action - 1);
                     _state = STATE_ENTER_PASSWORD;
                 }
-                if(_page == PAGE_NO_NETWORK_FOUND) {
+                else if(_page == PAGE_NO_NETWORK_FOUND) {
                     _state = STATE_NEW;
                 }
                 else { // PAGE_DISCONNECT
