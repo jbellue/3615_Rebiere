@@ -172,8 +172,6 @@ void WiFiMenu::showPage() {
         _page = PAGE_DISCONNECT;
     }
     else {
-        WiFi.mode(WIFI_STA);
-        WiFi.disconnect();
         _minitel->println("Scan en cours...");
         const int16_t n = WiFi.scanNetworks();
         _minitel->moveCursorUp(1);

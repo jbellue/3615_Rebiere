@@ -95,7 +95,6 @@ void setup() {
 
     xTaskCreatePinnedToCore(controlTask, "control", configSTACK, NULL, (tskIDLE_PRIORITY + 3), NULL, portNUM_PROCESSORS - 1);
     WiFi.begin();
-    WiFi.scanNetworks(true);
 }
 
 void loop() {
