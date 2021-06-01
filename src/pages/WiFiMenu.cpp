@@ -209,7 +209,7 @@ void WiFiMenu::showPage() {
 }
 
 unsigned long WiFiMenu::getInput() {
-    unsigned long key = _minitel->getKeyCode();
+    const unsigned long key = _minitel->getKeyCode();
     switch (key) {
         case CORRECTION:
         case ANNULATION:
