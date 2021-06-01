@@ -37,7 +37,7 @@ MenuItem::MenuOutput WiFiMenu::run(bool connected) {
                 else { // PAGE_DISCONNECT
                     WiFi.disconnect();
                     _minitel->println("Déconnexion...");
-                    while(WiFi.status() != WL_DISCONNECTED);
+                    while(WiFi.isConnected()); // wait for disconnection
                     _state = STATE_NEW;
                 }
             }
@@ -165,7 +165,7 @@ void WiFiMenu::showPage() {
     }
 
     _minitel->moveCursorDown(1);
-    if(WiFi.status() == WL_CONNECTED) {
+    if(WiFi.isConnected()) {
         _minitel->println("Connecté à " + WiFi.SSID());
         _minitel->moveCursorDown(1);
         _minitel->println("1 - Se déconnecter");
