@@ -3,9 +3,15 @@
 #include "utils.h"
 
 Weather::Weather(Minitel* m) :
-    Page {m} {
-    _state = STATE_INIT;
-    _weatherPage = 0;
+    Page {m},
+    _weatherPage(0),
+    _state(STATE_INIT),
+    _townName(NULL) {}
+
+Weather::~Weather() {
+    if(_townName) {
+        free(_townName);
+    }
 }
 
 MenuItem::MenuOutput Weather::run(bool connected) {
@@ -13,6 +19,14 @@ MenuItem::MenuOutput Weather::run(bool connected) {
         case STATE_INIT: {
             showConnectingPage();
             Error e = _weather.init();
+            if (e) {
+                _minitel->println("Erreur de connexion au serveur météo :");
+                _minitel->println(e.toString());
+                _minitel->println(e.msg);
+                delay(2000);
+                return MenuItem::MenuOutput::HOME;
+            }
+            e = _weather.getTown(&_townName);
             if (e) {
                 _minitel->println("Erreur de connexion au serveur météo :");
                 _minitel->println(e.toString());
@@ -269,7 +283,7 @@ void Weather::displayBottomMenu() {
     _minitel->print("Guide");
     _minitel->attributs(FOND_NORMAL);
     _minitel->println(" : Options"); 
-   
+
     _minitel->attributs(INVERSION_FOND);
     _minitel->print("Retour");
     _minitel->attributs(FOND_NORMAL);
@@ -308,6 +322,8 @@ void Weather::showPage() {
         char buffer[bufferSize];
         sprintf(buffer, "Météo du %s %d %s %d :", dayName, timeinfo->tm_mday, monthName, timeinfo->tm_year + 1900);
         _minitel->println(buffer);
+
+        _minitel->println(_townName);
 
         drawWeatherSymbol(w.weatherID);
         const uint8_t x = 18;

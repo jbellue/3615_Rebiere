@@ -8,6 +8,7 @@
 class Weather : public Page {
 public:
     Weather(Minitel* m);
+    ~Weather();
     MenuItem::MenuOutput run(bool connected);
 
 private:
@@ -41,6 +42,7 @@ private:
     };
 
     State _state;
+    char* _townName;
 };
 
 #endif

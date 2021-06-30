@@ -10,6 +10,7 @@ public:
     WeatherClient();
     ~WeatherClient();
     Error init();
+    Error getTown(char** townName);
 
     struct weatherData {
         long timestamp;

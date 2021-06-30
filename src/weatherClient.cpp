@@ -18,6 +18,62 @@ WeatherClient::~WeatherClient() {
     }
 }
 
+Error WeatherClient::getTown(char** title) {
+    Error ret;
+    HTTPClient http;
+    http.useHTTP10(true);
+    char urlBuffer[128];
+    sprintf(urlBuffer, "https://api.openweathermap.org/geo/1.0/reverse?lat=%.4f&lon=%.4f&limit=1&appid=%s",
+            preferences.getFloat("locationLat", 0.00),
+            preferences.getFloat("locationLon", 0.00),
+            preferences.getString("openWeatherKey").c_str());
+    http.begin(String(urlBuffer));
+    const int httpResponseStatus = http.GET();
+    if (httpResponseStatus == HTTP_CODE_OK) {
+        StaticJsonDocument<32> filter;
+        filter[0]["name"] = true;
+
+        StaticJsonDocument<96> doc;
+        DeserializationError error = deserializeJson(doc, http.getStream(), DeserializationOption::Filter(filter));
+
+        if (error) {
+            ret.id = Error::ErrorCode::DESERIALISE_JSON_FAILED;
+            ret.msg = strdup(error.c_str());
+        }
+        else {
+            *title = strdup(doc[0]["name"].as<const char*>());
+            ret.id = Error::ErrorCode::NONE;
+        }
+    }
+    else if (httpResponseStatus > 0) {
+        StaticJsonDocument<16> filter;
+        filter["message"] = true;
+
+        StaticJsonDocument<128> doc;
+        DeserializationError error = deserializeJson(doc, http.getStream(), DeserializationOption::Filter(filter));
+        if (error) {
+            ret.id = Error::ErrorCode::DESERIALISE_JSON_FAILED;
+            ret.msg = strdup(error.c_str());
+        }
+        else {
+            ret.id = Error::ErrorCode::API_ERROR;
+            const char* msg = doc["message"];
+            if (msg) {
+                ret.msg = strdup(msg);
+            }
+            else {
+                ret.msg = strdup(http.getString().c_str());
+            }
+        }
+    }
+    else {
+        ret.id = Error::ErrorCode::CONNECTION_FAILED;
+        ret.msg = strdup(http.errorToString(httpResponseStatus).c_str());
+    }
+    http.end();
+    return ret;
+}
+
 Error WeatherClient::init() {
     Error ret;
     HTTPClient http;
