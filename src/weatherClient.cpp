@@ -85,11 +85,8 @@ Error WeatherClient::init() {
             preferences.getString("openWeatherKey").c_str());
     http.begin(String(urlBuffer));
     const int httpResponseStatus = http.GET();
-    if (httpResponseStatus > 0) {
+    if (httpResponseStatus == HTTP_CODE_OK) {
         DynamicJsonDocument filter(1872);
-
-        filter["cod"] = true;
-        filter["message"] = true;
 
         JsonObject filter_current = filter.createNestedObject("current");
         filter_current["dt"] = true;
@@ -129,14 +126,28 @@ Error WeatherClient::init() {
             ret.msg = strdup(error.c_str());
         }
         else {
-            JsonVariant errorCode = doc["cod"];
-            if (!errorCode.isNull()) {
-                ret.id = Error::ErrorCode::API_ERROR;
-                ret.msg = strdup(doc["message"]);
+            storeWeatherData(doc);
+            ret.id = Error::ErrorCode::NONE;
+        }
+    }
+    else if (httpResponseStatus > 0) {
+        StaticJsonDocument<16> filter;
+        filter["message"] = true;
+
+        StaticJsonDocument<128> doc;
+        DeserializationError error = deserializeJson(doc, http.getStream(), DeserializationOption::Filter(filter));
+        if (error) {
+            ret.id = Error::ErrorCode::DESERIALISE_JSON_FAILED;
+            ret.msg = strdup(error.c_str());
+        }
+        else {
+            ret.id = Error::ErrorCode::API_ERROR;
+            const char* msg = doc["message"];
+            if (msg) {
+                ret.msg = strdup(msg);
             }
             else {
-                storeWeatherData(doc);
-                ret.id = Error::ErrorCode::NONE;
+                ret.msg = strdup(http.getString().c_str());
             }
         }
     }
