@@ -1,8 +1,10 @@
 #include "pages/sshPage.h"
+#include <iterator>
 
 MenuItem::MenuOutput SSHPage::run(bool connected) {
     switch(_state) {
         case STATE_NEW:
+            clearFields();
             showPage();
             _state = STATE_WAITING_FOR_INPUT;
             break;
@@ -84,6 +86,12 @@ void SSHPage::showPage() {
     _minitel->moveCursorLeft(40);
     _minitel->cursor();
     _minitel->moveCursorXY(0, 7);
+}
+
+void SSHPage::clearFields() {
+    for(String &s : _inputs) {
+        s = "";
+    }
 }
 
 SSHPage::Input SSHPage::getInput() {

@@ -19,6 +19,7 @@ private:
         INPUT_SOMMAIRE
     };
     void showPage();
+    void clearFields();
     Input getInput();
 
     enum State {
