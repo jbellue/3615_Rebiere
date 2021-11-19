@@ -10,12 +10,12 @@ class MenuItem {
     String _unconnectedName;
 
     enum MenuOutput {
-        NONE = -1,
-        HOME = 0,
-        WIFI_MENU,
-        WEATHER,
-        SSH,
-        SETTINGS
+        MenuOutput_NONE = -1,
+        MenuOutput_HOME = 0,
+        MenuOutput_WIFI_MENU,
+        MenuOutput_WEATHER,
+        MenuOutput_SSH,
+        MenuOutput_SETTINGS
     };
 
     void needsConnection(bool b) {_needsConnected = b;}

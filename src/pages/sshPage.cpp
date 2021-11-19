@@ -51,12 +51,9 @@ MenuItem::MenuOutput SSHPage::run(bool connected) {
                 _sshClient->cleanup();
                 delete _sshClient;
             }
-            _minitel->modeVideotex();
-            _minitel->echo(true);
-            _minitel->smallMode();
-            return MenuItem::MenuOutput::HOME;
+            return MenuItem::MenuOutput::MenuOutput_HOME;
     }
-    return MenuItem::MenuOutput::NONE;
+    return MenuItem::MenuOutput::MenuOutput_NONE;
 }
 
 void SSHPage::showPage() {

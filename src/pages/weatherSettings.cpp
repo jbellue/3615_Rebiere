@@ -28,7 +28,7 @@ MenuItem::MenuOutput WeatherSettings::run(bool connected) {
             // _state = STATE_CONNECTING;
         }
         else if (i == INPUT_SOMMAIRE) {
-            return MenuItem::MenuOutput::HOME;
+            return MenuItem::MenuOutput::MenuOutput_HOME;
         }
         else if (i == INPUT_SEARCH) {
             getCoordinatesFromSearch();
@@ -39,7 +39,7 @@ MenuItem::MenuOutput WeatherSettings::run(bool connected) {
     default:
         break;
     }
-    return MenuItem::MenuOutput::NONE;
+    return MenuItem::MenuOutput::MenuOutput_NONE;
 }
 
 void WeatherSettings::showMessage(const char* msg, const uint8_t offset = 0, bool shouldWait = true) {

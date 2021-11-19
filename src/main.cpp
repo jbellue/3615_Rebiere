@@ -59,21 +59,21 @@ void controlTask(void *pvParameter) {
             do {
                 ret = page->run(WiFi.isConnected());
             }
-            while(ret == MenuItem::MenuOutput::NONE);
+            while(ret == MenuItem::MenuOutput::MenuOutput_NONE);
             switch (ret) {
-                case MenuItem::MenuOutput::WIFI_MENU:
+                case MenuItem::MenuOutput::MenuOutput_WIFI_MENU:
                     newState(STATE_WIFI_MENU);
                     break;
-                case MenuItem::MenuOutput::WEATHER:
+                case MenuItem::MenuOutput::MenuOutput_WEATHER:
                     newState(STATE_WEATHER);
                     break;
-                case MenuItem::MenuOutput::SSH:
+                case MenuItem::MenuOutput::MenuOutput_SSH:
                     newState(STATE_SSH);
                     break;
-                case MenuItem::MenuOutput::SETTINGS:
+                case MenuItem::MenuOutput::MenuOutput_SETTINGS:
                     newState(STATE_SETTINGS);
                     break;
-                case MenuItem::MenuOutput::HOME:
+                case MenuItem::MenuOutput::MenuOutput_HOME:
                     newState(STATE_HOME_MENU);
                     break;
                 default:

@@ -24,7 +24,7 @@ MenuItem::MenuOutput Weather::run(bool connected) {
                 _minitel->println(e.toString());
                 _minitel->println(e.msg);
                 delay(2000);
-                return MenuItem::MenuOutput::HOME;
+                return MenuItem::MenuOutput::MenuOutput_HOME;
             }
             e = _weather.getTown(&_townName);
             if (e) {
@@ -32,7 +32,7 @@ MenuItem::MenuOutput Weather::run(bool connected) {
                 _minitel->println(e.toString());
                 _minitel->println(e.msg);
                 delay(2000);
-                return MenuItem::MenuOutput::HOME;
+                return MenuItem::MenuOutput::MenuOutput_HOME;
             }
             _maxPage = _weather.maxPage();
             _state = STATE_NEW;
@@ -48,15 +48,15 @@ MenuItem::MenuOutput Weather::run(bool connected) {
                 _state = STATE_NEW;
             }
             else if (i == GO_TO_SOMMAIRE) {
-                return MenuItem::MenuOutput::HOME;
+                return MenuItem::MenuOutput::MenuOutput_HOME;
             }
             else if (i == GO_TO_SETTINGS) {
-                return MenuItem::MenuOutput::SETTINGS;
+                return MenuItem::MenuOutput::MenuOutput_SETTINGS;
             }
             break;
         }
     }
-    return MenuItem::MenuOutput::NONE;
+    return MenuItem::MenuOutput::MenuOutput_NONE;
 }
 
 void Weather::showConnectingPage() {

@@ -12,7 +12,7 @@ public:
         _minitel(m) {};
     virtual ~Page() = default;
 
-    virtual MenuItem::MenuOutput run(bool connected) { return MenuItem::MenuOutput::HOME; }
+    virtual MenuItem::MenuOutput run(bool connected) { return MenuItem::MenuOutput::MenuOutput_HOME; }
 };
 
 #endif

@@ -47,9 +47,9 @@ MenuItem::MenuOutput WiFiMenu::run(bool connected) {
             passwordForm();
             break;
         case STATE_DONE:
-            return MenuItem::MenuOutput::HOME;
+            return MenuItem::MenuOutput::MenuOutput_HOME;
     }
-    return MenuItem::MenuOutput::NONE;
+    return MenuItem::MenuOutput::MenuOutput_NONE;
 }
 
 static uint8_t connectionStatus;

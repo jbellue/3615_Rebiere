@@ -15,19 +15,19 @@ void Menu::initMenuItems() {
     _items[0]._name = "Options WiFi";
     _items[0]._unconnectedName = "Connexion à un réseau WiFi";
     _items[0].needsConnection(false);
-    _items[0].id = MenuItem::WIFI_MENU;
+    _items[0].id = MenuItem::MenuOutput_WIFI_MENU;
 
     _items[1]._name = "Météo";
     _items[1].needsConnection(true);
-    _items[1].id = MenuItem::WEATHER;
+    _items[1].id = MenuItem::MenuOutput_WEATHER;
 
     _items[2]._name = "Client SSH";
     _items[2].needsConnection(true);
-    _items[2].id = MenuItem::SSH;
+    _items[2].id = MenuItem::MenuOutput_SSH;
 
     _items[3]._name = "Localisation pour la météo";
     _items[3].needsConnection(false);
-    _items[3].id = MenuItem::SETTINGS;
+    _items[3].id = MenuItem::MenuOutput_SETTINGS;
 }
 
 MenuItem::MenuOutput Menu::run(bool connected) {
@@ -49,7 +49,7 @@ MenuItem::MenuOutput Menu::run(bool connected) {
             break;
         case STATE_CHECK_INPUT:
             const MenuItem::MenuOutput newPage = checkInput();
-            if (newPage == MenuItem::MenuOutput::HOME) {
+            if (newPage == MenuItem::MenuOutput::MenuOutput_HOME) {
                 _state = STATE_NEW;
             }
             else {
@@ -57,7 +57,7 @@ MenuItem::MenuOutput Menu::run(bool connected) {
             }
             break;
     }
-    return MenuItem::MenuOutput::NONE;
+    return MenuItem::MenuOutput::MenuOutput_NONE;
 }
 
 MenuItem::MenuOutput Menu::checkInput() {
@@ -67,7 +67,7 @@ MenuItem::MenuOutput Menu::checkInput() {
             return _items[i].id;
         }
     }
-    return MenuItem::HOME;
+    return MenuItem::MenuOutput_HOME;
 }
 
 void Menu::showPage() {
