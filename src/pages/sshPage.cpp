@@ -24,7 +24,7 @@ MenuItem::MenuOutput SSHPage::run(bool connected) {
                     _inputs[FIELD_PASSWORD].c_str()
             );
             if (status == SSHClient::SSHStatus::OK) {
-                _minitel->modeTeleinformatique();
+                _minitel->standardTeleinformatique();
                 _minitel->echo(false);
                 _state = STATE_CONNECTED;
             }
@@ -51,6 +51,7 @@ MenuItem::MenuOutput SSHPage::run(bool connected) {
                 _sshClient->cleanup();
                 delete _sshClient;
             }
+            _minitel->standardTeletel();
             return MenuItem::MenuOutput::MenuOutput_HOME;
     }
     return MenuItem::MenuOutput::MenuOutput_NONE;
