@@ -25,7 +25,7 @@ bool SSHClient::poll(Minitel* minitel) {
 
     const int nbytes = ssh_channel_read_nonblocking(_channel, _readBuffer, sizeof(_readBuffer), 0);
     if (nbytes > 0) {
-        minitel->printRaw(_readBuffer);
+        minitel->printRaw(_readBuffer, nbytes);
     }
     char writeBuffer[4] = { 0 };
     const size_t len = getMinitelInput(minitel->getKeyCode(), writeBuffer);
